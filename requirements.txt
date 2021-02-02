@@ -3,3 +3,4 @@ sk-video
 dlib
 opencv-python
 numpy
+keras

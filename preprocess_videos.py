@@ -4,7 +4,6 @@ import sys
 import fnmatch
 import os
 import numpy as np
-from skimage import io
 import dlib
 import cv2
 
