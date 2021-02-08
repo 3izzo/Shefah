@@ -5,8 +5,26 @@ import fnmatch
 from fuzzywuzzy import fuzz
 
 
-letters = ["ا", "ب", "ت", "ة", "ث", "ح", "خ", "د",
-           "ر", "س", "ص", "ع", "ف", "ل", "م", "ن", "و", "ي", ]
+letters = [
+    "ا",
+    "ب",
+    "ت",
+    "ة",
+    "ث",
+    "ح",
+    "خ",
+    "د",
+    "ر",
+    "س",
+    "ص",
+    "ع",
+    "ف",
+    "ل",
+    "م",
+    "ن",
+    "و",
+    "ي",
+]
 
 mapping = {
     "0": "صفر",
@@ -31,15 +49,15 @@ def load_video_frames(path):
     frames = []
     i = 0
     while True:
-        name = path + '\\frame%d.png' % i
-        frame = cv2.imread(name,0)
-        if(type(frame) == type(None)):
+        name = path + "\\frame%d.png" % i
+        frame = cv2.imread(name)
+        if type(frame) == type(None):
             break
         frames.append(frame)
         i += 1
     # padding
-    while(i < max_frame_count):
-        frames.append(np.zeros((frame_h, frame_w,)))
+    while i < max_frame_count:
+        frames.append(np.zeros((frame_h, frame_w, 3)))
         i += 1
     # normalize the frame
     return np.array(frames).astype(np.float32) / 255
@@ -70,23 +88,23 @@ def get_video_and_label(path):
 def translate_label_to_array(label):
     arr = np.empty((max_label_length))
     for i in range(max_label_length):
-        if(i >= len(label)):
+        if i >= len(label):
             arr[i] = len(letters)
         else:
             letter = label[i]
-            if(letter == ' '):
+            if letter == " ":
                 arr[i] = len(letters)
             else:
-                arr[i] = (letters.index(letter))
+                arr[i] = letters.index(letter)
     return arr.astype(np.int8)
 
 
 def translate_array_to_label(arr):
     label = ""
     for i in arr:
-        if(i == -1):
+        if i == -1:
             break
-        if(i >= len(letters)):
+        if i >= len(letters):
             label += " "
         else:
             letter = letters[i]
@@ -109,13 +127,13 @@ def translate_word_to_number(word):
     for key in mapping.keys():
         value = mapping[key]
         ratio = fuzz.ratio(word, value)
-        if(ratio > best_ratio):
+        if ratio > best_ratio:
             res = key
             best_ratio = ratio
     return res
 
 
-def get_train_test_data():
+def get_train_validation_test_data():
     videos = []
     labels = []
     for dir in find_dirs(".\\PreprocessedVideos", "[0-9] [0-9]"):
@@ -128,24 +146,37 @@ def get_train_test_data():
         # print(label)
         labels.append(label)
     videos_count = len(videos)
-    training_ratio = 0.80
+    training_ratio = 0.60
+    validation_ratio = 0.20
 
     x_train = []
     y_train = []
+    x_validation = []
+    y_validation = []
 
+    x_test = videos[:]
+    y_test = labels[:]
     np.random.seed(69)
     for i in range(int(videos_count * training_ratio)):
-        random_index = np.random.randint(
-            0, int(videos_count * training_ratio) - i)
+        random_index = np.random.randint(0, len(x_test))
         x_train.append(videos[random_index])
         y_train.append(labels[random_index])
 
-        videos.pop(random_index)
-        labels.pop(random_index)
+        x_test.pop(random_index)
+        y_test.pop(random_index)
+
+    for i in range(int(videos_count * validation_ratio)):
+        random_index = np.random.randint(0, len(x_test))
+        x_validation.append(videos[random_index])
+        y_validation.append(labels[random_index])
+
+        x_test.pop(random_index)
+        y_test.pop(random_index)
 
     x_train = np.array(x_train)
     y_train = np.array(y_train)
-    x_test = np.array(videos)
-    y_test = np.array(labels)
 
-    return x_train, y_train, x_test, y_test
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+    
+    return x_train, y_train, x_validation, y_validation, x_test, y_test

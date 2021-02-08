@@ -1,4 +1,4 @@
-sk-image
+scikit-image
 sk-video
 dlib
 opencv-python
