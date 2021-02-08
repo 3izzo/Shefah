@@ -86,12 +86,14 @@ predictor = dlib.shape_predictor(".\\shape_predictor_68_face_landmarks.dat")
 for video_path in find_files(input_videos_dir, "[0-9] [0-9].mp4"):
     storage_dir = video_path.replace(".mp4", "")
     storage_dir = storage_dir.replace(input_videos_dir, output_videos_dir)
-    make_dir(storage_dir)
-    print(storage_dir)
+    make_dir(storage_dir+"\\unmirrored")
+    make_dir(storage_dir+"\\mirrored")
     i = 0
     for frame in get_video_frames(video_path):
 
         cropped_frame = cv2.cvtColor(get_frames_mouth(
             face_detector, predictor, frame), cv2.COLOR_BGR2RGB)
-        cv2.imwrite("%s\\frame%d.png" % (storage_dir, i), cropped_frame)
+        mirrored = cv2.flip(cropped_frame, 1)
+        cv2.imwrite("%s\\unmirrored\\frame%d.png" % (storage_dir, i), cropped_frame)
+        cv2.imwrite("%s\\mirrored\\frame%d.png" % (storage_dir, i), mirrored)
         i += 1

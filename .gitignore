@@ -3,3 +3,4 @@ Videos
 /PreprocessedVideos
 /.vscode
 /Checkpoints
+/__pycache__
