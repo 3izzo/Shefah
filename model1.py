@@ -92,13 +92,21 @@ class ShefahModel(object):
 
         self.gru_1 = Bidirectional(
             GRU(
-                256, return_sequences=True, kernel_initializer="Orthogonal", name="gru1"
+                256,
+                return_sequences=True,
+                kernel_initializer="Orthogonal",
+                name="gru1",
+                reset_after=False,
             ),
             merge_mode="concat",
         )(self.resh1)
         self.gru_2 = Bidirectional(
             GRU(
-                256, return_sequences=True, kernel_initializer="Orthogonal", name="gru2"
+                256,
+                return_sequences=True,
+                kernel_initializer="Orthogonal",
+                name="gru2",
+                reset_after=False,
             ),
             merge_mode="concat",
         )(self.gru_1)
@@ -166,7 +174,7 @@ if gpus:
     y_validation,
     x_test,
     y_test,
-) = get_train_validation_test_data()
+) = get_train_validation_test_paths()
 
 shefah_model = ShefahModel()
 model = shefah_model.model
@@ -226,29 +234,29 @@ print(
 
 # print(decoded1)
 def decode_predict_ctc(out, top_paths=5):
-    results = []
-    beam_width = 5
-    if beam_width < top_paths:
-        beam_width = top_paths
-    for i in range(top_paths):
-        res = K.get_value(
-            K.ctc_decode(
-                out,
-                input_length=np.ones(out.shape[0]) * out.shape[1],
-                greedy=False,
-                beam_width=beam_width,
-                top_paths=top_paths,
-            )[0][i]
-        )[0]
-        text = translate_array_to_label(res)
-        results.append(text)
-    return results
+    beam_width = 200
+    decoded = K.ctc_decode(
+        out[0],
+        input_length=np.ones(out[0].shape[0]) * out[0].shape[1],
+        greedy=False,
+        beam_width=beam_width,
+        top_paths=top_paths,
+    )
+    # K.ctc_decode(y_pred=y_pred, input_length=input_length,greedy=greedy, beam_width=beam_width, top_paths=top_paths)
+    paths = [path.numpy() for path in decoded[0]]
+
+    res = []
+    for output in paths[0]:
+        res.append(translate_array_to_label(output))
+    return res
 
 
 def test_model(x, y):
     total_wer = 0
     for i in range(len(y)):
-        result1, result2 = shefah_model.predict(np.array([x[i]]))
+        frames = load_video_frames(x[i])
+        video = np.array([frames])
+        result = shefah_model.predict(video)
         # decoded1, decoded2 = K.ctc_decode(y_pred=result2, input_length=np.array([max_frame_count]),
         #                                   greedy=True)
         print(
@@ -258,7 +266,7 @@ def test_model(x, y):
         # paths = [path.numpy() for path in decoded1[0]]
         # # print(paths)
         # print(result1)
-        top_pred_texts = decode_predict_ctc(result1)
+        top_pred_texts = decode_predict_ctc(result)
         print(top_pred_texts)
         predicted = top_pred_texts[0]
         actual = translate_array_to_label(y[i])
