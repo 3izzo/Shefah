@@ -6,46 +6,44 @@ from fuzzywuzzy import fuzz
 
 
 letters = [
-    "ا",
-    "ب",
-    "ت",
-    "ة",
-    "ث",
-    "ح",
-    "خ",
-    "د",
-    "ر",
-    "س",
-    "ص",
-    "ع",
-    "ف",
-    "ل",
-    "م",
-    "ن",
-    "و",
-    "ي",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
 ]
 
-mapping = {
-    "0": "صفر",
-    "1": "واحد",
-    "2": "اثنين",
-    "3": "ثلاثة",
-    "4": "اربعة",
-    "5": "خمسة",
-    "6": "ستة",
-    "7": "سبعة",
-    "8": "ثمانية",
-    "9": "تسعة",
-}
-max_label_length = 14
-max_frame_count = 86
+max_label_length = 32
+max_frame_count = 75
 max_letter_index = len(letters) + 2  # 20
 frame_h = 50
 frame_w = 100
 
-
+video_cache = {}
 def load_video_frames(path):
+    if(path in video_cache):
+        return video_cache[path]
     frames = []
     i = 0
     while True:
@@ -60,7 +58,12 @@ def load_video_frames(path):
         frames.append(np.zeros((frame_h, frame_w, 3)))
         i += 1
     # normalize the frame
-    return np.array(frames).astype(np.float32) / 255
+    try:
+        res = np.array(frames).astype(np.float32) / 255
+        video_cache[path] = res
+        return res
+    except:
+        print("error loading frames from", path, np.array(frames).shape)
 
 
 def find_dirs(directory, pattern):
@@ -75,11 +78,7 @@ def find_dirs(directory, pattern):
 def get_video_and_label(path):
     frames = load_video_frames(path)
     split_path = path.split("\\")
-    label_as_numbers = split_path[-2].split(".")[0]
-    numbers = label_as_numbers.split(" ")
-    label = ""
-    for n in numbers:
-        label += mapping[n] + " "
+    label = split_path[-2].split(".")[0]
     # label += " " * (max_label_length - len(label))
     # print(label_as_numbers, label, len(label))
     return frames, translate_label_to_array(label)
@@ -89,7 +88,7 @@ def translate_label_to_array(label):
     arr = np.empty((max_label_length))
     for i in range(max_label_length):
         if i >= len(label):
-            arr[i] = len(letters)
+            arr[i] = -1
         else:
             letter = label[i]
             if letter == " ":
@@ -97,7 +96,8 @@ def translate_label_to_array(label):
             else:
                 arr[i] = letters.index(letter)
     return arr.astype(np.int8)
-
+# [18, 4, 19, 26, 17, 4, 3, 26, 0, 19, 26, 0, 26, 19, 22, 14, 26, 13, 14, 22, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26]
+# [18, 4, 19, 26, 17, 4, 3, 26, 0, 19, 26, 0, 26, 19, 22, 14, 26, 13, 14, 22]
 
 def translate_array_to_label(arr):
     label = ""
@@ -112,40 +112,22 @@ def translate_array_to_label(arr):
     return label
 
 
-def translate_label_to_number(label):
-    label = label.strip()
-    res = ""
-    words = label.split(" ")
-    for word in words:
-        res += str(translate_word_to_number(word)) + " "
-    return res.strip()
-
-
-def translate_word_to_number(word):
-    res = 0
-    best_ratio = 0
-    for key in mapping.keys():
-        value = mapping[key]
-        ratio = fuzz.ratio(word, value)
-        if ratio > best_ratio:
-            res = key
-            best_ratio = ratio
-    return res
-
-
-def get_train_validation_test_data():
-    videos = []
+def get_train_validation_test_paths():
+    paths = []
     labels = []
-    for dir in find_dirs(".\\PreprocessedVideos", "[0-9] [0-9]"):
-        frames, label = get_video_and_label(dir + "\\mirrored")
-        videos.append(frames)
-        # print(label)
-        labels.append(label)
-        frames, label = get_video_and_label(dir + "\\unmirrored")
-        videos.append(frames)
-        # print(label)
-        labels.append(label)
-    videos_count = len(videos)
+    for dir in find_dirs(".\\GRID PRE", "mirrored"):
+
+        paths.append(dir)
+        split_path = dir.split("\\")
+        label = split_path[-2].split(".")[0]
+        labels.append(translate_label_to_array(label))
+
+        dir = dir.replace("mirrored", "unmirrored")
+        paths.append(dir)
+        split_path = dir.split("\\")
+        label = split_path[-2].split(".")[0]
+        labels.append(translate_label_to_array(label))
+    videos_count = len(paths)
     training_ratio = 0.60
     validation_ratio = 0.20
 
@@ -154,12 +136,12 @@ def get_train_validation_test_data():
     x_validation = []
     y_validation = []
 
-    x_test = videos[:]
+    x_test = paths[:]
     y_test = labels[:]
     np.random.seed(69)
     for i in range(int(videos_count * training_ratio)):
         random_index = np.random.randint(0, len(x_test))
-        x_train.append(videos[random_index])
+        x_train.append(paths[random_index])
         y_train.append(labels[random_index])
 
         x_test.pop(random_index)
@@ -167,7 +149,7 @@ def get_train_validation_test_data():
 
     for i in range(int(videos_count * validation_ratio)):
         random_index = np.random.randint(0, len(x_test))
-        x_validation.append(videos[random_index])
+        x_validation.append(paths[random_index])
         y_validation.append(labels[random_index])
 
         x_test.pop(random_index)
@@ -178,5 +160,5 @@ def get_train_validation_test_data():
 
     x_test = np.array(x_test)
     y_test = np.array(y_test)
-    
+
     return x_train, y_train, x_validation, y_validation, x_test, y_test
