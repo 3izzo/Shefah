@@ -98,7 +98,7 @@ def translate_label_to_array(label):
     arr = np.empty((max_label_length))
     for i in range(max_label_length):
         if i >= len(label):
-            arr[i] = -1
+            arr[i] = len(letters) + 1
         else:
             letter = label[i]
             if letter == " ":
@@ -148,17 +148,25 @@ def get_train_validation_test_paths():
     for dir in find_dirs(".\\PreprocessedVideos", "mirrored"):
         paths.append(dir)
         split_path = dir.split("\\")
-        label = split_path[-2].split(".")[0]
+        numbers = split_path[-2].split(".")[0].split(" ")
+        label = ""
+        for n in numbers:
+            label += mapping[n] + " "
+        label = label.strip()
         labels.append(translate_label_to_array(label))
 
         dir = dir.replace("mirrored", "unmirrored")
         paths.append(dir)
         split_path = dir.split("\\")
-        label = split_path[-2].split(".")[0]
+        numbers = split_path[-2].split(".")[0].split(" ")
+        label = ""
+        for n in numbers:
+            label += mapping[n] + " "
+        label = label.strip()
         labels.append(translate_label_to_array(label))
     videos_count = len(paths)
-    training_ratio = 0.60
-    validation_ratio = 0.20
+    training_ratio = 0.70
+    validation_ratio = 0.15
 
     x_train = []
     y_train = []

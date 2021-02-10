@@ -63,7 +63,6 @@ class DataGenerator(keras.utils.Sequence):
         # Generate data
         for i, ID in enumerate(list_videos_temp):
             # Store sample
-            print(list_videos_temp[i])
             X[i] = load_video_frames(list_videos_temp[i])
             y[i] = list_labels_temp[i]
             # np.load("data/" + ID + ".npy")
