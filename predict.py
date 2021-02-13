@@ -66,7 +66,7 @@ def decode_predict_ctc(out, top_paths=5):
     return res
 
 
-video_path = ".\\Videos\\speaker1\\2 4.mp4"
+video_path = ".\\Videos\\speaker1\\7.mp4"
 
 frames = []
 i =0

@@ -80,20 +80,55 @@ def make_dir(dir):
         pass
 
 
-# make_dir(output_videos_dir)
+def preproc_speaker(speaker_index):
+    from datetime import datetime
+
+    for video_path in find_files(
+        input_videos_dir + "\\speaker" + str(speaker_index), "*.mp4"
+    ):
+        start_time = datetime.now()
+        storage_dir = video_path.replace(input_videos_dir,output_videos_dir).replace(".mp4", "")
+        make_dir(storage_dir + "\\unmirrored")
+        make_dir(storage_dir + "\\mirrored")
+        frame_index = 0
+        for frame in get_video_frames(video_path):
+            cropped_frame = cv2.cvtColor(
+                get_frames_mouth(face_detector, predictor, frame), cv2.COLOR_BGR2RGB
+            )
+            mirrored = cv2.flip(cropped_frame, 1)
+            cv2.imwrite(
+                "%s\\unmirrored\\frame%d.png" % (storage_dir, frame_index),
+                cropped_frame,
+            )
+            cv2.imwrite(
+                "%s\\mirrored\\frame%d.png" % (storage_dir, frame_index), mirrored
+            )
+            frame_index += 1
+        delta_time = datetime.now() - start_time
+        print(
+            "Done",
+            storage_dir,
+            "in",
+            delta_time.microseconds / 1000000 + delta_time.seconds,
+            "s",
+        )
 face_detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(".\\shape_predictor_68_face_landmarks.dat")
-# for video_path in find_files(input_videos_dir, "[0-9] [0-9].mp4"):
-#     storage_dir = video_path.replace(".mp4", "")
-#     storage_dir = storage_dir.replace(input_videos_dir, output_videos_dir)
-#     make_dir(storage_dir+"\\unmirrored")
-#     make_dir(storage_dir+"\\mirrored")
-#     i = 0
-#     for frame in get_video_frames(video_path):
+if __name__ == "__main__":
+    def get_number_of_speakers():
+        count = 0
+        for root, dirs, files in os.walk(input_videos_dir):
+                count += len(dirs)
+        return count
 
-#         cropped_frame = cv2.cvtColor(get_frames_mouth(
-#             face_detector, predictor, frame), cv2.COLOR_BGR2RGB)
-#         mirrored = cv2.flip(cropped_frame, 1)
-#         cv2.imwrite("%s\\unmirrored\\frame%d.png" % (storage_dir, i), cropped_frame)
-#         cv2.imwrite("%s\\mirrored\\frame%d.png" % (storage_dir, i), mirrored)
-#         i += 1
+    import multiprocessing
+    from joblib import Parallel, delayed
+
+    num_cores = multiprocessing.cpu_count()
+    print(num_cores)
+    make_dir(output_videos_dir)
+   
+
+    Parallel(n_jobs=num_cores)(
+        delayed(preproc_speaker)(speaker_index) for speaker_index in range(1, get_number_of_speakers() + 1)
+    )

@@ -39,7 +39,7 @@ mapping = {
     "9": "تسعة",
 }
 max_label_length = 14
-max_frame_count = 86
+max_frame_count = 50
 max_letter_index = len(letters) + 2  # 20
 frame_h = 50
 frame_w = 100
