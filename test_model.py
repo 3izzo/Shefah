@@ -1,10 +1,8 @@
 from keras import backend as K
 import numpy as np
 import tensorflow as tf
-from layers import CTC
 from Utilities import *
 from data_generator import DataGenerator
-from jiwer import wer
 from keras import optimizers
 from model1 import ShefahModel
 from preprocess_videos import *
@@ -75,8 +73,10 @@ def decode_predict_ctc(out, top_paths=5):
     y_test,
 ) = get_train_validation_test_paths()
 
+
 def test_model(x, y):
-    total_wer = 0
+    labels = []
+    predictions = []
     for i in range(len(y)):
         frames = load_video_frames(x[i])
         video = np.array([frames])
@@ -84,8 +84,7 @@ def test_model(x, y):
         # decoded1, decoded2 = K.ctc_decode(y_pred=result2, input_length=np.array([max_frame_count]),
         #                                   greedy=True)
         print(
-            "%d==============================================================================="
-            % i
+            "==============================================================================="
         )
         # paths = [path.numpy() for path in decoded1[0]]
         # # print(paths)
@@ -94,28 +93,53 @@ def test_model(x, y):
         print(top_pred_texts)
         predicted = top_pred_texts[0]
         actual = translate_array_to_label(y[i])
-        predicted_as_numbers = translate_label_to_number(predicted)
-        actual_as_numbers = translate_label_to_number(actual)
-        wordError = wer(actual_as_numbers, predicted_as_numbers)
-        total_wer += wordError
+        predicted_as_numbers = int(translate_label_to_number(predicted))
+        actual_as_numbers = int(translate_label_to_number(actual))
+
+        labels.append(actual_as_numbers)
+        predictions.append(predicted_as_numbers)
         print(
             "Predicted: ",
             predicted_as_numbers,
+            predicted,
             ", Actual:",
             actual_as_numbers,
-            predicted,
             actual,
-            wordError,
         )
-    print(total_wer / len(x))
+    print("Confusion Matrix:")
+    print(tf.math.confusion_matrix(labels, np.array(predictions)))
 
 
+count_labels = np.zeros((10))
+for i in range(len(y_train)):
+    count_labels[
+        int(translate_label_to_number(translate_array_to_label(y_train[i])))
+    ] += 1
+    print(x_train[i], translate_label_to_number(translate_array_to_label(y_train[i])))
+
+for i in range(len(y_validation)):
+    count_labels[
+        int(translate_label_to_number(translate_array_to_label(y_validation[i])))
+    ] += 1
+    print(
+        x_validation[i],
+        translate_label_to_number(translate_array_to_label(y_validation[i])),
+    )
+
+for i in range(len(y_test)):
+    count_labels[
+        int(translate_label_to_number(translate_array_to_label(y_test[i])))
+    ] += 1
+    print(x_test[i], translate_label_to_number(translate_array_to_label(y_test[i])))
+
+print(count_labels)
+print("Training data =================================================================")
 test_model(x_train, y_train)
 print("===============================================================================")
 print("===============================================================================")
-print("===============================================================================")
+print("Validation data ===============================================================")
 test_model(x_validation, y_validation)
 print("===============================================================================")
 print("===============================================================================")
-print("===============================================================================")
+print("Tesing data ===================================================================")
 test_model(x_test, y_test)

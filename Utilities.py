@@ -178,22 +178,25 @@ def get_train_validation_test_paths():
     np.random.seed(69)
     for i in range(int(videos_count * training_ratio)):
         random_index = np.random.randint(0, len(x_test))
-        x_train.append(paths[random_index])
-        y_train.append(labels[random_index])
+        x_train.append(x_test[random_index])
+        y_train.append(y_test[random_index])
 
         x_test.pop(random_index)
         y_test.pop(random_index)
 
     for i in range(int(videos_count * validation_ratio)):
         random_index = np.random.randint(0, len(x_test))
-        x_validation.append(paths[random_index])
-        y_validation.append(labels[random_index])
+        x_validation.append(x_test[random_index])
+        y_validation.append(y_test[random_index])
 
         x_test.pop(random_index)
         y_test.pop(random_index)
 
     x_train = np.array(x_train)
     y_train = np.array(y_train)
+
+    x_validation = np.array(x_validation)
+    y_validation = np.array(y_validation)
 
     x_test = np.array(x_test)
     y_test = np.array(y_test)
