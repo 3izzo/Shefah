@@ -65,10 +65,10 @@ if latest:
 else:
     # print(paths)
     train_generator = DataGenerator(
-        x_train, y_train, input_shape=shefah_model.input_shape, batch_size=20
+        x_train, y_train, input_shape=shefah_model.input_shape, batch_size=25
     )
     validation_generator = DataGenerator(
-        x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=20
+        x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=25
     )
     model.fit(
         train_generator,
