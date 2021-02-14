@@ -51,11 +51,11 @@ class ShefahModel(object):
             kernel_initializer="he_normal",
             name="conv1",
         )(self.zero1)
-        # self.batc1 = BatchNormalization(name="batc1")(self.conv1)
-        # self.actv1 = Activation("relu", name="actv1")(self.batc1)
-        # self.drop1 = SpatialDropout3D(0.5)(self.actv1)
+        self.batc1 = BatchNormalization(name="batc1")(self.conv1)
+        self.actv1 = Activation("relu", name="actv1")(self.batc1)
+        self.drop1 = SpatialDropout3D(0.5)(self.actv1)
         self.maxp1 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max1")(
-            self.conv1
+            self.drop1
         )
 
         self.zero2 = ZeroPadding3D(padding=(1, 2, 2), name="zero2")(self.maxp1)
@@ -66,11 +66,11 @@ class ShefahModel(object):
             kernel_initializer="he_normal",
             name="conv2",
         )(self.zero2)
-        # self.batc2 = BatchNormalization(name="batc2")(self.conv2)
-        # self.actv2 = Activation("relu", name="actv2")(self.batc2)
-        # self.drop2 = SpatialDropout3D(0.5)(self.actv2)
+        self.batc2 = BatchNormalization(name="batc2")(self.conv2)
+        self.actv2 = Activation("relu", name="actv2")(self.batc2)
+        self.drop2 = SpatialDropout3D(0.5)(self.actv2)
         self.maxp2 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max2")(
-            self.conv2
+            self.drop2
         )
 
         self.zero3 = ZeroPadding3D(padding=(1, 1, 1), name="zero3")(self.maxp2)
@@ -81,11 +81,11 @@ class ShefahModel(object):
             kernel_initializer="he_normal",
             name="conv3",
         )(self.zero3)
-        # self.batc3 = BatchNormalization(name="batc3")(self.conv3)
-        # self.actv3 = Activation("relu", name="actv3")(self.batc3)
-        # self.drop3 = SpatialDropout3D(0.5)(self.actv3)
+        self.batc3 = BatchNormalization(name="batc3")(self.conv3)
+        self.actv3 = Activation("relu", name="actv3")(self.batc3)
+        self.drop3 = SpatialDropout3D(0.5)(self.actv3)
         self.maxp3 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max3")(
-            self.conv3
+            self.drop3
         )
 
         self.resh1 = TimeDistributed(Flatten())(self.maxp3)
