@@ -20,32 +20,6 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
-# create model
-shefah_model = ShefahModel()
-model = shefah_model.model
-
-# compile model
-model.compile(
-    optimizer=optimizers.RMSprop(lr=0.01),
-    loss={"ctc": lambda y_true, y_pred: y_pred},
-    metrics=[
-        "accuracy",
-    ],
-)
-
-
-checkpoint_pattern = ".\\Checkpoints\\cp-{epoch:04d}.ckpt"
-checkpoint_dir = os.path.dirname(checkpoint_pattern)
-
-latest = tf.train.latest_checkpoint(checkpoint_dir)
-
-if latest:
-    model.load_weights(latest)
-    print("-------------------------------------")
-    print("loaded weights from %s" % latest)
-else:
-    print("No weights found")
-
 
 def decode_predict_ctc(out, top_paths=5):
     beam_width = 200
@@ -74,23 +48,22 @@ def decode_predict_ctc(out, top_paths=5):
 ) = get_train_validation_test_paths()
 
 
-def test_model(x, y):
+def test_data(x, y, shefah_model, print_info=False):
+
     labels = []
     predictions = []
-    for i in range(len(y)):
+    accuracy = 0
+    for i in range(len(x)):
         frames = load_video_frames(x[i])
         video = np.array([frames])
         result = shefah_model.predict(video)
         # decoded1, decoded2 = K.ctc_decode(y_pred=result2, input_length=np.array([max_frame_count]),
         #                                   greedy=True)
-        print(
-            "==============================================================================="
-        )
+
         # paths = [path.numpy() for path in decoded1[0]]
         # # print(paths)
         # print(result1)
         top_pred_texts = decode_predict_ctc(result)
-        print(top_pred_texts)
         predicted = top_pred_texts[0]
         actual = translate_array_to_label(y[i])
         predicted_as_numbers = int(translate_label_to_number(predicted))
@@ -98,48 +71,75 @@ def test_model(x, y):
 
         labels.append(actual_as_numbers)
         predictions.append(predicted_as_numbers)
-        print(
-            "Predicted: ",
-            predicted_as_numbers,
-            predicted,
-            ", Actual:",
-            actual_as_numbers,
-            actual,
-        )
-    print("Confusion Matrix:")
-    print(tf.math.confusion_matrix(labels, np.array(predictions)))
+        if actual_as_numbers == predicted_as_numbers:
+            accuracy += 1
+        if print_info:
+            print(
+                "Predicted: ",
+                predicted_as_numbers,
+                predicted,
+                ", Actual:",
+                actual_as_numbers,
+                actual,
+            )
+    confusion_matrix = tf.math.confusion_matrix(labels, np.array(predictions))
+    accuracy = accuracy / len(y)
+    count_labels = np.zeros((10))
+    for label in labels:
+        count_labels[label] += 1
+    if print_info:
+        print("Accuracy: ", accuracy)
+        print("Count: ", count_labels)
+        print("Confusion Matrix:")
+        print(confusion_matrix)
+
+    return accuracy, count_labels, confusion_matrix
 
 
-count_labels = np.zeros((10))
-for i in range(len(y_train)):
-    count_labels[
-        int(translate_label_to_number(translate_array_to_label(y_train[i])))
-    ] += 1
-    print(x_train[i], translate_label_to_number(translate_array_to_label(y_train[i])))
+def test_model(shefah_model, print_info=False):
 
-for i in range(len(y_validation)):
-    count_labels[
-        int(translate_label_to_number(translate_array_to_label(y_validation[i])))
-    ] += 1
-    print(
-        x_validation[i],
-        translate_label_to_number(translate_array_to_label(y_validation[i])),
+    if print_info:
+        print("Training data =======================================================")
+    train_a, train_c, train_m = test_data(x_train, y_train, shefah_model, print_info)
+    if print_info:
+        print("=====================================================================")
+        print("=====================================================================")
+        print("Validation data =====================================================")
+    validation_a, validation_c, validation_m = test_data(
+        x_validation, y_validation, shefah_model, print_info
+    )
+    if print_info:
+        print("=====================================================================")
+        print("=====================================================================")
+        print("Tesing data =========================================================")
+    test_a, test_c, test_m = test_data(x_test, y_test, shefah_model, print_info)
+    return train_a, train_m, validation_a, validation_m, test_a, test_m
+
+
+if __name__ == "__main__":
+    # create model
+    shefah_model = ShefahModel()
+    model = shefah_model.model
+
+    # compile model
+    model.compile(
+        optimizer=optimizers.RMSprop(lr=0.01),
+        loss={"ctc": lambda y_true, y_pred: y_pred},
+        metrics=[
+            "accuracy",
+        ],
     )
 
-for i in range(len(y_test)):
-    count_labels[
-        int(translate_label_to_number(translate_array_to_label(y_test[i])))
-    ] += 1
-    print(x_test[i], translate_label_to_number(translate_array_to_label(y_test[i])))
+    checkpoint_pattern = ".\\Checkpoints\\cp-{epoch:04d}.ckpt"
+    checkpoint_dir = os.path.dirname(checkpoint_pattern)
 
-print(count_labels)
-print("Training data =================================================================")
-test_model(x_train, y_train)
-print("===============================================================================")
-print("===============================================================================")
-print("Validation data ===============================================================")
-test_model(x_validation, y_validation)
-print("===============================================================================")
-print("===============================================================================")
-print("Tesing data ===================================================================")
-test_model(x_test, y_test)
+    latest = tf.train.latest_checkpoint(checkpoint_dir)
+
+    if latest:
+        model.load_weights(latest)
+        print("-------------------------------------")
+        print("loaded weights from %s" % latest)
+    else:
+        print("No weights found")
+
+    test_model(shefah_model, True)

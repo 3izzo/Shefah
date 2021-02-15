@@ -1,15 +1,11 @@
 from keras.models import Model
 from keras import backend as K
-import sys
 import numpy as np
 import tensorflow as tf
-from layers import CTC
 from Utilities import *
 from data_generator import DataGenerator
-from jiwer import wer
 from keras import optimizers
 from model1 import ShefahModel
-
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
 if gpus:
@@ -23,7 +19,7 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
-tf.compat.v1.disable_eager_execution()
+# tf.compat.v1.disable_eager_execution()
 
 # Get Data
 (
@@ -52,9 +48,7 @@ model.compile(
 checkpoint_pattern = ".\\Checkpoints\\cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_pattern)
 
-cp_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=50
-)
+
 
 latest = tf.train.latest_checkpoint(checkpoint_dir)
 
@@ -71,10 +65,12 @@ else:
     validation_generator = DataGenerator(
         x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
     )
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200
+    )
     model.fit(
         train_generator,
         validation_data=validation_generator,
-        epochs=500,
-
+        epochs=1000,
         callbacks=[cp_callback],
     )

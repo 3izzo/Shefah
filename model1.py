@@ -132,17 +132,17 @@ class ShefahModel(object):
             inputs=[self.input_data, self.labels, self.input_length, self.label_length],
             outputs=self.loss_out,
         )
+        self.partial_model = Model(self.input_data, self.y_pred)
 
     def summary(self):
-        Model(inputs=self.input_data, outputs=self.y_pred).summary()
+        self.partial_model.summary()
 
     def predict(self, input_batch):
-        partial_model = Model(self.input_data, self.y_pred)
 
         # runs the model in training mode
-        output_train = partial_model(input_batch, training=True)
+        output_train = self.partial_model(input_batch, training=True)
         # runs the model in test mode
-        output_test = partial_model(input_batch, training=False)
+        output_test = self.partial_model(input_batch, training=False)
         # the first 0 indicates test
         # return self.test_function([input_batch, 0])[0]
         return output_train, output_test
@@ -153,7 +153,3 @@ class ShefahModel(object):
         return K.function(
             [self.input_data, K.learning_phase()], [self.y_pred, K.learning_phase()]
         )
-
-
-
-
