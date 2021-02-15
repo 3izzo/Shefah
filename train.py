@@ -6,6 +6,7 @@ from Utilities import *
 from data_generator import DataGenerator
 from keras import optimizers
 from model1 import ShefahModel
+
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
 if gpus:
@@ -49,28 +50,29 @@ checkpoint_pattern = ".\\Checkpoints\\cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_pattern)
 
 
-
 latest = tf.train.latest_checkpoint(checkpoint_dir)
-
+start_epoch = 0
 if latest:
     model.load_weights(latest)
+    start_epoch = int("".join(c for c in latest if c.isdigit()))
     print("-------------------------------------")
     print("loaded weights from %s" % latest)
-else:
-    # print(paths)
+    print("epoch is ", start_epoch)
+# print(paths)
 
-    train_generator = DataGenerator(
-        x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64
-    )
-    validation_generator = DataGenerator(
-        x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
-    )
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200
-    )
-    model.fit(
-        train_generator,
-        validation_data=validation_generator,
-        epochs=1000,
-        callbacks=[cp_callback],
-    )
+train_generator = DataGenerator(
+    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64
+)
+validation_generator = DataGenerator(
+    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
+)
+cp_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200
+)
+model.fit(
+    train_generator,
+    validation_data=validation_generator,
+    epochs=5000,
+    initial_epoch=start_epoch,
+    callbacks=[cp_callback],
+)
