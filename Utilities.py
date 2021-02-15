@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import os
-import fnmatch
+import re
 from fuzzywuzzy import fuzz
 
 
@@ -76,22 +76,20 @@ def find_dirs(directory, pattern):
     for root, dirs, files in os.walk(directory):
         # print(root, dirs, files)
         for basename in dirs:
-            if fnmatch.fnmatch(basename, pattern):
+            # print(basename,re.match(basename, pattern))
+            if re.match(pattern, basename):
                 dir = os.path.join(root, basename)
                 yield dir
 
 
-def get_video_and_label(path):
-    frames = load_video_frames(path)
+def get_label_from_path(path):
     split_path = path.split("\\")
     label_as_numbers = split_path[-2].split(".")[0]
     numbers = label_as_numbers.split(" ")
     label = ""
     for n in numbers:
         label += mapping[n] + " "
-    # label += " " * (max_label_length - len(label))
-    # print(label_as_numbers, label, len(label))
-    return frames, translate_label_to_array(label)
+    return translate_label_to_array(label)
 
 
 def translate_label_to_array(label):
@@ -142,63 +140,65 @@ def translate_word_to_number(word):
     return res
 
 
+SPEAKER_TRAIN_COUNT = 11
+SPEAKER_VALIDATION_COUNT = 2
+
+
 def get_train_validation_test_paths():
-    paths = []
-    labels = []
-    for dir in find_dirs(".\\PreprocessedVideos", "mirrored"):
-        paths.append(dir)
-        split_path = dir.split("\\")
-        numbers = split_path[-2].split(".")[0].split(" ")
-        label = ""
-        for n in numbers:
-            label += mapping[n] + " "
-        label = label.strip()
-        labels.append(translate_label_to_array(label))
+    speakers_paths = []
+    for dir in find_dirs(".\\PreprocessedVideos", "speaker([1-9]|([0-9][0-9]))"):
+        speakers_paths.append(dir)
 
-        dir = dir.replace("mirrored", "unmirrored")
-        paths.append(dir)
-        split_path = dir.split("\\")
-        numbers = split_path[-2].split(".")[0].split(" ")
-        label = ""
-        for n in numbers:
-            label += mapping[n] + " "
-        label = label.strip()
-        labels.append(translate_label_to_array(label))
-    videos_count = len(paths)
-    training_ratio = 0.70
-    validation_ratio = 0.15
+    train_paths = []
+    train_labels = []
+    validation_paths = []
+    validation_labels = []
+    test_paths = []
+    test_labels = []
 
-    x_train = []
-    y_train = []
-    x_validation = []
-    y_validation = []
+    # choose random speakers and all of their videos to the training data
+    for i in range(SPEAKER_TRAIN_COUNT):
+        # choose random speaker from speakers_paths
+        random_index = np.random.randint(0, len(speakers_paths))
+        speaker_path = speakers_paths.pop(random_index)
 
-    x_test = paths[:]
-    y_test = labels[:]
-    np.random.seed(69)
-    for i in range(int(videos_count * training_ratio)):
-        random_index = np.random.randint(0, len(x_test))
-        x_train.append(x_test[random_index])
-        y_train.append(y_test[random_index])
+        # go through every video of the speaker
+        for dir in find_dirs(speaker_path, "mirrored"):
+            train_paths.append(dir)
+            train_labels.append(get_label_from_path(dir))
+        for dir in find_dirs(speaker_path, "unmirrored"):
+            train_paths.append(dir)
+            train_labels.append(get_label_from_path(dir))
 
-        x_test.pop(random_index)
-        y_test.pop(random_index)
+    # choose random speakers and all of their videos to the validation data
+    for i in range(SPEAKER_VALIDATION_COUNT):
+        # choose random speaker from speakers_paths
+        random_index = np.random.randint(0, len(speakers_paths))
+        speaker_path = speakers_paths.pop(random_index)
 
-    for i in range(int(videos_count * validation_ratio)):
-        random_index = np.random.randint(0, len(x_test))
-        x_validation.append(x_test[random_index])
-        y_validation.append(y_test[random_index])
+        # go through every video of the speaker
+        for dir in find_dirs(speaker_path, "mirrored"):
+            validation_paths.append(dir)
+            validation_labels.append(get_label_from_path(dir))
+        for dir in find_dirs(speaker_path, "unmirrored"):
+            validation_paths.append(dir)
+            validation_labels.append(get_label_from_path(dir))
 
-        x_test.pop(random_index)
-        y_test.pop(random_index)
+    for speaker_path in speakers_paths:
+        for dir in find_dirs(speaker_path, "mirrored"):
+            test_paths.append(dir)
+            test_labels.append(get_label_from_path(dir))
+        for dir in find_dirs(speaker_path, "unmirrored"):
+            test_paths.append(dir)
+            test_labels.append(get_label_from_path(dir))
+    return (
+        train_paths,
+        train_labels,
+        validation_paths,
+        validation_labels,
+        test_paths,
+        test_labels,
+    )
 
-    x_train = np.array(x_train)
-    y_train = np.array(y_train)
 
-    x_validation = np.array(x_validation)
-    y_validation = np.array(y_validation)
-
-    x_test = np.array(x_test)
-    y_test = np.array(y_test)
-
-    return x_train, y_train, x_validation, y_validation, x_test, y_test
+get_train_validation_test_paths()
