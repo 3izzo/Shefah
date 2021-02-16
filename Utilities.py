@@ -77,7 +77,10 @@ def load_video_frames(path):
 def mirror_frames(frames):
     mirrored=[]
     for frame in frames:
-        mirrored = cv2.flip(frame, 1)
+        # cv2.imshow(frame)
+        mirrored.append(cv2.flip(frame, 1))
+        # cv2.imshow(mirrored)
+
         
     return mirrored
 
