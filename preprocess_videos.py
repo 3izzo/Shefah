@@ -58,11 +58,12 @@ def get_frames_mouth(detector, predictor, frame):
         normalize_ratio = MOUTH_WIDTH / float(mouth_right - mouth_left)
 
     new_img_shape = (
-        int(frame.shape[1] * normalize_ratio), int(frame.shape[0] * normalize_ratio))
+        int(frame.shape[1] * normalize_ratio),
+        int(frame.shape[0] * normalize_ratio),
+    )
     resized_img = cv2.resize(
-        src=frame,
-        dsize=new_img_shape,
-        interpolation=cv2.INTER_CUBIC)
+        src=frame, dsize=new_img_shape, interpolation=cv2.INTER_CUBIC
+    )
     mouth_centroid_norm = mouth_centroid * normalize_ratio
 
     mouth_l = int(mouth_centroid_norm[0] - MOUTH_WIDTH / 2)
@@ -87,7 +88,9 @@ def preproc_speaker(speaker_index):
         input_videos_dir + "\\speaker" + str(speaker_index), "*.mp4"
     ):
         start_time = datetime.now()
-        storage_dir = video_path.replace(input_videos_dir,output_videos_dir).replace(".mp4", "")
+        storage_dir = video_path.replace(input_videos_dir, output_videos_dir).replace(
+            ".mp4", ""
+        )
         make_dir(storage_dir)
 
         frame_index = 0
@@ -110,23 +113,27 @@ def preproc_speaker(speaker_index):
             delta_time.microseconds / 1000000 + delta_time.seconds,
             "s",
         )
+
+
 face_detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(".\\shape_predictor_68_face_landmarks.dat")
 if __name__ == "__main__":
+
     def get_number_of_speakers():
         count = 0
         for root, dirs, files in os.walk(input_videos_dir):
-                count += len(dirs)
+            count = len(dirs)
+            break
         return count
 
     import multiprocessing
     from joblib import Parallel, delayed
 
     num_cores = multiprocessing.cpu_count()
-    print(num_cores)
+    num_speakers = get_number_of_speakers()
+    print("cores :", num_cores, " speakers : ", num_speakers)
     make_dir(output_videos_dir)
-   
 
     Parallel(n_jobs=num_cores)(
-        delayed(preproc_speaker)(speaker_index) for speaker_index in range(14, 16)
+        delayed(preproc_speaker)(speaker_index) for speaker_index in (range(num_speakers))
     )
