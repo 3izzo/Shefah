@@ -3,7 +3,8 @@ import cv2
 import os
 import re
 from fuzzywuzzy import fuzz
-
+from numpy import random as numpy_random
+import random
 
 letters = [
     "ا",
@@ -89,7 +90,7 @@ def get_label_from_path(path):
     label = ""
     for n in numbers:
         label += mapping[n] + " "
-    return translate_label_to_array(label)
+    return label
 
 
 def translate_label_to_array(label):
@@ -140,11 +141,13 @@ def translate_word_to_number(word):
     return res
 
 
-SPEAKER_TRAIN_COUNT = 11
-SPEAKER_VALIDATION_COUNT = 2
+SPEAKER_TRAIN_COUNT = 9
+SPEAKER_VALIDATION_COUNT = 3
+seed = 69
 
 
 def get_train_validation_test_paths():
+    numpy_random.seed(seed)
     speakers_paths = []
     for dir in find_dirs(".\\PreprocessedVideos", "speaker([1-9]|([0-9][0-9]))"):
         speakers_paths.append(dir)
@@ -156,41 +159,42 @@ def get_train_validation_test_paths():
     test_paths = []
     test_labels = []
 
+    print("training speakers:")
     # choose random speakers and all of their videos to the training data
     for i in range(SPEAKER_TRAIN_COUNT):
+
         # choose random speaker from speakers_paths
         random_index = np.random.randint(0, len(speakers_paths))
         speaker_path = speakers_paths.pop(random_index)
-
-        # go through every video of the speaker
-        for dir in find_dirs(speaker_path, "mirrored"):
-            train_paths.append(dir)
-            train_labels.append(get_label_from_path(dir))
-        for dir in find_dirs(speaker_path, "unmirrored"):
-            train_paths.append(dir)
-            train_labels.append(get_label_from_path(dir))
+        print(speaker_path)
+        extract_videos(train_paths, train_labels, speaker_path, "mirrored")
+        extract_videos(train_paths, train_labels, speaker_path, "unmirrored")
+    print("validation speakers:")
 
     # choose random speakers and all of their videos to the validation data
     for i in range(SPEAKER_VALIDATION_COUNT):
         # choose random speaker from speakers_paths
         random_index = np.random.randint(0, len(speakers_paths))
         speaker_path = speakers_paths.pop(random_index)
+        print(speaker_path)
 
-        # go through every video of the speaker
-        for dir in find_dirs(speaker_path, "mirrored"):
-            validation_paths.append(dir)
-            validation_labels.append(get_label_from_path(dir))
-        for dir in find_dirs(speaker_path, "unmirrored"):
-            validation_paths.append(dir)
-            validation_labels.append(get_label_from_path(dir))
+        extract_videos(validation_paths, validation_labels, speaker_path, "mirrored")
+        extract_videos(validation_paths, validation_labels, speaker_path, "unmirrored")
+    print("testing speakers:")
 
     for speaker_path in speakers_paths:
-        for dir in find_dirs(speaker_path, "mirrored"):
-            test_paths.append(dir)
-            test_labels.append(get_label_from_path(dir))
-        for dir in find_dirs(speaker_path, "unmirrored"):
-            test_paths.append(dir)
-            test_labels.append(get_label_from_path(dir))
+        print(speaker_path)
+
+        extract_videos(test_paths, test_labels, speaker_path, "mirrored")
+        extract_videos(test_paths, test_labels, speaker_path, "unmirrored")
+    random.Random(seed).shuffle(train_paths)
+    random.Random(seed).shuffle(train_labels)
+
+    random.Random(seed + 1).shuffle(validation_paths)
+    random.Random(seed + 1).shuffle(validation_labels)
+
+    random.Random(seed - 1).shuffle(test_paths)
+    random.Random(seed - 1).shuffle(test_labels)
     return (
         train_paths,
         train_labels,
@@ -201,4 +205,11 @@ def get_train_validation_test_paths():
     )
 
 
-get_train_validation_test_paths()
+def extract_videos(train_paths, train_labels, speaker_path, pattern):
+    # go through every video of the speaker
+    for dir in find_dirs(speaker_path, pattern):
+        label = get_label_from_path(dir)
+        if int(translate_label_to_number(label)) >= 5:
+            continue
+        train_paths.append(dir)
+        train_labels.append(translate_label_to_array(label))

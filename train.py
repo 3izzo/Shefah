@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from Utilities import *
 from data_generator import DataGenerator
-from keras import optimizers
+from keras.optimizers import Adam
 from model1 import ShefahModel
 
 # Enable GPU Accleration
@@ -38,7 +38,7 @@ model = shefah_model.model
 
 # compile model
 model.compile(
-    optimizer=optimizers.RMSprop(lr=0.01),
+    optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08),
     loss={"ctc": lambda y_true, y_pred: y_pred},
     metrics=[
         "accuracy",
