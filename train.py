@@ -61,10 +61,10 @@ if latest:
 # print(paths)
 
 train_generator = DataGenerator(
-    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64
+    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=32
 )
 validation_generator = DataGenerator(
-    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
+    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=10
 )
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200

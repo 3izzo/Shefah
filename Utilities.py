@@ -53,13 +53,15 @@ def load_video_frames(path):
         return video_cache[path]
     frames = []
     i = 0
-    while True:
+    while i < max_frame_count:
         name = path + "\\frame%d.png" % i
         frame = cv2.imread(name)
         if type(frame) == type(None):
             break
         frames.append(frame)
         i += 1
+    else:
+        print("WARNING VIDEO HAS MORE FRAMES THAN THE LIMIT OF %d. Any frame above the limit will be ignored" % max_frame_count)
     # padding
     while i < max_frame_count:
         frames.append(np.zeros((frame_h, frame_w, 3)))
@@ -71,6 +73,14 @@ def load_video_frames(path):
         return res
     except:
         print("error loading frames from", path, np.array(frames).shape)
+
+def mirror_frames(frames):
+    mirrored=[]
+    for frame in frames:
+        mirrored = cv2.flip(frame, 1)
+        
+    return mirrored
+
 
 
 def find_dirs(directory, pattern):
@@ -85,7 +95,7 @@ def find_dirs(directory, pattern):
 
 def get_label_from_path(path):
     split_path = path.split("\\")
-    label_as_numbers = split_path[-2].split(".")[0]
+    label_as_numbers = split_path[-1].split(".")[0]
     numbers = label_as_numbers.split(" ")
     label = ""
     for n in numbers:
@@ -124,8 +134,7 @@ def translate_label_to_number(label):
     label = label.strip()
     res = ""
     words = label.split(" ")
-    for word in words:
-        res += str(translate_word_to_number(word)) + " "
+    res += str(translate_word_to_number(words[0])) + " "
     return res.strip()
 
 
@@ -142,7 +151,7 @@ def translate_word_to_number(word):
 
 
 SPEAKER_TRAIN_COUNT = 9
-SPEAKER_VALIDATION_COUNT = 3
+SPEAKER_VALIDATION_COUNT = 4
 seed = 69
 
 
@@ -167,8 +176,7 @@ def get_train_validation_test_paths():
         random_index = np.random.randint(0, len(speakers_paths))
         speaker_path = speakers_paths.pop(random_index)
         print(speaker_path)
-        extract_videos(train_paths, train_labels, speaker_path, "mirrored")
-        extract_videos(train_paths, train_labels, speaker_path, "unmirrored")
+        extract_videos(train_paths, train_labels, speaker_path)
     print("validation speakers:")
 
     # choose random speakers and all of their videos to the validation data
@@ -178,15 +186,13 @@ def get_train_validation_test_paths():
         speaker_path = speakers_paths.pop(random_index)
         print(speaker_path)
 
-        extract_videos(validation_paths, validation_labels, speaker_path, "mirrored")
-        extract_videos(validation_paths, validation_labels, speaker_path, "unmirrored")
+        extract_videos(validation_paths, validation_labels, speaker_path)
     print("testing speakers:")
 
     for speaker_path in speakers_paths:
         print(speaker_path)
+        extract_videos(test_paths, test_labels, speaker_path)
 
-        extract_videos(test_paths, test_labels, speaker_path, "mirrored")
-        extract_videos(test_paths, test_labels, speaker_path, "unmirrored")
     random.Random(seed).shuffle(train_paths)
     random.Random(seed).shuffle(train_labels)
 
@@ -205,9 +211,9 @@ def get_train_validation_test_paths():
     )
 
 
-def extract_videos(train_paths, train_labels, speaker_path, pattern):
+def extract_videos(train_paths, train_labels, speaker_path):
     # go through every video of the speaker
-    for dir in find_dirs(speaker_path, pattern):
+    for dir in find_dirs(speaker_path, "[0-9]"):
         label = get_label_from_path(dir)
         if int(translate_label_to_number(label)) >= 5:
             continue

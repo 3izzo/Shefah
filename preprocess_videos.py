@@ -88,22 +88,20 @@ def preproc_speaker(speaker_index):
     ):
         start_time = datetime.now()
         storage_dir = video_path.replace(input_videos_dir,output_videos_dir).replace(".mp4", "")
-        make_dir(storage_dir + "\\unmirrored")
-        make_dir(storage_dir + "\\mirrored")
+        make_dir(storage_dir)
+
         frame_index = 0
         for frame in get_video_frames(video_path):
             cropped_frame = cv2.cvtColor(
                 get_frames_mouth(face_detector, predictor, frame), cv2.COLOR_BGR2RGB
             )
-            mirrored = cv2.flip(cropped_frame, 1)
+
             cv2.imwrite(
-                "%s\\unmirrored\\frame%d.png" % (storage_dir, frame_index),
+                "%s\\frame%d.png" % (storage_dir, frame_index),
                 cropped_frame,
             )
-            cv2.imwrite(
-                "%s\\mirrored\\frame%d.png" % (storage_dir, frame_index), mirrored
-            )
             frame_index += 1
+
         delta_time = datetime.now() - start_time
         print(
             "Done",
