@@ -85,7 +85,7 @@ def preproc_speaker(speaker_index):
     from datetime import datetime
 
     for video_path in find_files(
-        input_videos_dir + "\\speaker" + str(speaker_index), "*.mp4"
+        input_videos_dir + "\\speaker" + str(speaker_index), "[0-9].mp4"
     ):
         start_time = datetime.now()
         storage_dir = video_path.replace(input_videos_dir, output_videos_dir).replace(
