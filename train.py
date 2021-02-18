@@ -5,6 +5,7 @@ from Utilities import *
 from data_generator import DataGenerator
 from keras.optimizers import Adam
 from model1 import ShefahModel
+import sys
 
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
@@ -19,6 +20,7 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
+
 # Get Data
 (
     x_train,
@@ -27,7 +29,7 @@ if gpus:
     y_validation,
     x_test,
     y_test,
-) = get_train_validation_test_paths()
+) = get_train_validation_test_paths(int(sys.argv[1]), int(sys.argv[2]))
 
 # create model
 shefah_model = ShefahModel()

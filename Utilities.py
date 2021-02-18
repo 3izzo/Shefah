@@ -49,8 +49,7 @@ input_videos_dir = ".\\Videos"
 output_videos_dir = ".\\PreprocessedVideos"
 checkpoints_dir = ".\\Checkpoints"
 checkpoint_pattern = checkpoints_dir + "\\cp-{epoch:04d}.ckpt"
-SPEAKER_TRAIN_COUNT = 25
-SPEAKER_VALIDATION_COUNT = 5
+
 seed = 69
 
 video_cache = {}
@@ -162,7 +161,7 @@ def translate_word_to_number(word):
     return res
 
 
-def get_train_validation_test_paths():
+def get_train_validation_test_paths(trainCount,valCount):
     numpy_random.seed(seed)
     speakers_paths = []
     for dir in find_dirs(".\\PreprocessedVideos", "speaker([1-9]|([0-9][0-9]))"):
@@ -177,7 +176,7 @@ def get_train_validation_test_paths():
 
     print("training speakers:")
     # choose random speakers and all of their videos to the training data
-    for i in range(SPEAKER_TRAIN_COUNT):
+    for i in range(trainCount):
 
         # choose random speaker from speakers_paths
         random_index = np.random.randint(0, len(speakers_paths))
@@ -187,7 +186,7 @@ def get_train_validation_test_paths():
     print("validation speakers:")
 
     # choose random speakers and all of their videos to the validation data
-    for i in range(SPEAKER_VALIDATION_COUNT):
+    for i in range(valCount):
         # choose random speaker from speakers_paths
         random_index = np.random.randint(0, len(speakers_paths))
         speaker_path = speakers_paths.pop(random_index)

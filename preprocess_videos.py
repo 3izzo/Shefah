@@ -131,5 +131,5 @@ if __name__ == "__main__":
 
     Parallel(n_jobs=num_cores)(
         delayed(preproc_speaker)(speaker_index)
-        for speaker_index in range(21, num_speakers)
+        for speaker_index in range(num_speakers)
     )

@@ -4,6 +4,7 @@ import tensorflow as tf
 from Utilities import *
 from model1 import ShefahModel
 from preprocess_videos import *
+import sys
 
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
@@ -43,7 +44,7 @@ def decode_predict_ctc(out, top_paths=5):
     y_validation,
     x_test,
     y_test,
-) = get_train_validation_test_paths()
+) = get_train_validation_test_paths(int(sys.argv[1]), int(sys.argv[2]))
 
 
 def test_data(x, y, shefah_model, print_info=False):
