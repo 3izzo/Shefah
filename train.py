@@ -1,6 +1,5 @@
 from keras.models import Model
 from keras import backend as K
-import numpy as np
 import tensorflow as tf
 from Utilities import *
 from data_generator import DataGenerator
@@ -20,8 +19,6 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
-# tf.compat.v1.disable_eager_execution()
-
 # Get Data
 (
     x_train,
@@ -40,13 +37,9 @@ model = shefah_model.model
 model.compile(
     optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08),
     loss={"ctc": lambda y_true, y_pred: y_pred},
-    metrics=[
-        "accuracy",
-    ],
 )
 
 
-checkpoint_pattern = ".\\Checkpoints\\cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_pattern)
 
 
@@ -61,10 +54,10 @@ if latest:
 # print(paths)
 
 train_generator = DataGenerator(
-    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=32
+    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64
 )
 validation_generator = DataGenerator(
-    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=10
+    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
 )
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200

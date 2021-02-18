@@ -7,14 +7,8 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers import Input
 from keras.models import Model
 from keras import backend as K
-import sys
-import numpy as np
-import tensorflow as tf
 from layers import CTC
 from Utilities import *
-from data_generator import DataGenerator
-from jiwer import wer
-from keras import optimizers
 
 
 class ShefahModel(object):

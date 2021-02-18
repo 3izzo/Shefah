@@ -2,8 +2,6 @@ from keras import backend as K
 import numpy as np
 import tensorflow as tf
 from Utilities import *
-from data_generator import DataGenerator
-from keras import optimizers
 from model1 import ShefahModel
 from preprocess_videos import *
 
@@ -101,13 +99,21 @@ def test_model(shefah_model, print_info=False):
     if print_info:
         print("Training data =======================================================")
     train_a, train_c, train_m = test_data(x_train, y_train, shefah_model, print_info)
-    if print_info:
-        print("=====================================================================")
-        print("=====================================================================")
-        print("Validation data =====================================================")
-    validation_a, validation_c, validation_m = test_data(
-        x_validation, y_validation, shefah_model, print_info
-    )
+    validation_a, validation_c, validation_m = (None, None, None)
+    if len(x_validation) > 0:
+        if print_info:
+            print(
+                "====================================================================="
+            )
+            print(
+                "====================================================================="
+            )
+            print(
+                "Validation data ====================================================="
+            )
+        validation_a, validation_c, validation_m = test_data(
+            x_validation, y_validation, shefah_model, print_info
+        )
     if print_info:
         print("=====================================================================")
         print("=====================================================================")
@@ -122,19 +128,11 @@ if __name__ == "__main__":
     model = shefah_model.model
 
     # compile model
-    model.compile(
-        optimizer=optimizers.RMSprop(lr=0.01),
-        loss={"ctc": lambda y_true, y_pred: y_pred},
-        metrics=[
-            "accuracy",
-        ],
-    )
+    model.compile()
 
-    checkpoint_pattern = ".\\Checkpoints\\cp-{epoch:04d}.ckpt"
     checkpoint_dir = os.path.dirname(checkpoint_pattern)
 
     latest = tf.train.latest_checkpoint(checkpoint_dir)
-
     if latest:
         model.load_weights(latest)
         print("-------------------------------------")

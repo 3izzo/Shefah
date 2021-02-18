@@ -45,6 +45,14 @@ max_letter_index = len(letters) + 2  # 20
 frame_h = 50
 frame_w = 100
 
+input_videos_dir = ".\\Videos"
+output_videos_dir = ".\\PreprocessedVideos"
+checkpoints_dir = ".\\Checkpoints"
+checkpoint_pattern = checkpoints_dir + "\\cp-{epoch:04d}.ckpt"
+SPEAKER_TRAIN_COUNT = 25
+SPEAKER_VALIDATION_COUNT = 5
+seed = 69
+
 video_cache = {}
 
 
@@ -61,7 +69,10 @@ def load_video_frames(path):
         frames.append(frame)
         i += 1
     else:
-        print("WARNING VIDEO HAS MORE FRAMES THAN THE LIMIT OF %d. Any frame above the limit will be ignored" % max_frame_count)
+        print(
+            "WARNING VIDEO HAS MORE FRAMES THAN THE LIMIT OF %d. Any frame above the limit will be ignored"
+            % max_frame_count
+        )
     # padding
     while i < max_frame_count:
         frames.append(np.zeros((frame_h, frame_w, 3)))
@@ -74,16 +85,14 @@ def load_video_frames(path):
     except:
         print("error loading frames from", path, np.array(frames).shape)
 
+
 def mirror_frames(frames):
-    mirrored=[]
+    mirrored = []
     for frame in frames:
         # cv2.imshow(frame)
         mirrored.append(cv2.flip(frame, 1))
         # cv2.imshow(mirrored)
-
-        
     return mirrored
-
 
 
 def find_dirs(directory, pattern):
@@ -151,11 +160,6 @@ def translate_word_to_number(word):
             res = key
             best_ratio = ratio
     return res
-
-
-SPEAKER_TRAIN_COUNT = 9
-SPEAKER_VALIDATION_COUNT = 4
-seed = 69
 
 
 def get_train_validation_test_paths():

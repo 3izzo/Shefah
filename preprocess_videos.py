@@ -1,15 +1,10 @@
 import skvideo.io
-import errno
-import sys
 import fnmatch
 import os
 import numpy as np
 import dlib
 import cv2
-
-
-input_videos_dir = ".\\Videos"
-output_videos_dir = ".\\PreprocessedVideos"
+from Utilities import input_videos_dir, output_videos_dir
 
 
 def find_files(directory, pattern):
@@ -85,7 +80,7 @@ def preproc_speaker(speaker_index):
     from datetime import datetime
 
     for video_path in find_files(
-        input_videos_dir + "\\speaker" + str(speaker_index), "[0-9].mp4"
+        input_videos_dir + "\\speaker" + str(speaker_index + 1), "[0-9].mp4"
     ):
         start_time = datetime.now()
         storage_dir = video_path.replace(input_videos_dir, output_videos_dir).replace(
@@ -135,5 +130,6 @@ if __name__ == "__main__":
     make_dir(output_videos_dir)
 
     Parallel(n_jobs=num_cores)(
-        delayed(preproc_speaker)(speaker_index) for speaker_index in (range(num_speakers))
+        delayed(preproc_speaker)(speaker_index)
+        for speaker_index in range(21, num_speakers)
     )
