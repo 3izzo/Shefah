@@ -23,8 +23,8 @@ if gpus:
 def decode_predict_ctc(out, top_paths=5):
     beam_width = 200
     decoded = K.ctc_decode(
-        out[0],
-        input_length=np.ones(out[0].shape[0]) * out[0].shape[1],
+        out,
+        input_length=np.ones(out.shape[0]) * out.shape[1],
         greedy=False,
         beam_width=beam_width,
         top_paths=top_paths,
@@ -52,21 +52,21 @@ def test_data(x, y, shefah_model, print_info=False):
     labels = []
     predictions = []
     accuracy = 0
+    videos = []
+    actuals_as_numbers = []
     for i in range(len(x)):
         frames = load_video_frames(x[i])
-        video = np.array([frames])
-        result = shefah_model.predict(video)
-        # decoded1, decoded2 = K.ctc_decode(y_pred=result2, input_length=np.array([max_frame_count]),
-        #                                   greedy=True)
-
-        # paths = [path.numpy() for path in decoded1[0]]
-        # # print(paths)
-        # print(result1)
-        top_pred_texts = decode_predict_ctc(result)
-        predicted = top_pred_texts[0]
         actual = translate_array_to_label(y[i])
-        predicted_as_numbers = int(translate_label_to_number(predicted))
         actual_as_numbers = int(translate_label_to_number(actual))
+        videos.append(frames)
+        actuals_as_numbers.append(actual_as_numbers)
+    results = shefah_model.predict(np.array(videos))
+
+    for result, actual_as_numbers in zip(results[0], actuals_as_numbers):
+        top_pred_texts = decode_predict_ctc(np.array([result]))
+        predicted = top_pred_texts[0]
+
+        predicted_as_numbers = int(translate_label_to_number(predicted))
 
         labels.append(actual_as_numbers)
         predictions.append(predicted_as_numbers)
@@ -124,21 +124,27 @@ def test_model(shefah_model, print_info=False):
 
 
 if __name__ == "__main__":
-    # create model
-    shefah_model = ShefahModel()
-    model = shefah_model.model
-
-    # compile model
-    model.compile()
-
-    checkpoint_dir = os.path.dirname(checkpoint_pattern)
-
-    latest = tf.train.latest_checkpoint(checkpoint_dir)
-    if latest:
-        model.load_weights(latest)
-        print("-------------------------------------")
-        print("loaded weights from %s" % latest)
+    testAllCheckpoints = sys.argv[3].lower() == "true"
+    print(testAllCheckpoints)
+    checkpoints = []
+    if testAllCheckpoints:
+        for file in find_files(checkpoints_dir, "*.ckpt.data*"):
+            checkpoints.append(file.split(".data")[0])
     else:
-        print("No weights found")
+        checkpoints = [tf.train.latest_checkpoint(os.path.dirname(checkpoint_pattern))]
 
-    test_model(shefah_model, True)
+    if len(checkpoints) == 0:
+        print("No Weights Found")
+    else:
+        for checkpoint in checkpoints:
+            # create model
+            shefah_model = ShefahModel()
+            model = shefah_model.model
+
+            # compile model
+            model.compile()
+            model.load_weights(checkpoint)
+            print(checkpoint)
+            print(test_model(shefah_model, not testAllCheckpoints))
+            print("===============")
+            tf.keras.backend.clear_session()

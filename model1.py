@@ -134,12 +134,12 @@ class ShefahModel(object):
     def predict(self, input_batch):
 
         # runs the model in training mode
-        output_train = self.partial_model(input_batch, training=True)
+        output_train = self.partial_model.predict(input_batch)
         # runs the model in test mode
-        output_test = self.partial_model(input_batch, training=False)
+        # output_test = self.partial_model(input_batch)
         # the first 0 indicates test
         # return self.test_function([input_batch, 0])[0]
-        return output_train, output_test
+        return output_train, output_train
 
     @property
     def test_function(self):
