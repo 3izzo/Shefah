@@ -1,5 +1,6 @@
 from keras import backend as K
 import numpy as np
+import logging
 import tensorflow as tf
 from Utilities import *
 from model1 import ShefahModel
@@ -99,7 +100,8 @@ def test_model(shefah_model, print_info=False):
 
     if print_info:
         print("Training data =======================================================")
-    train_a, train_c, train_m = test_data(x_train, y_train, shefah_model, print_info)
+    train_a, train_c, train_m = test_data(
+        x_train, y_train, shefah_model, print_info)
     validation_a, validation_c, validation_m = (None, None, None)
     if len(x_validation) > 0:
         if print_info:
@@ -119,11 +121,13 @@ def test_model(shefah_model, print_info=False):
         print("=====================================================================")
         print("=====================================================================")
         print("Tesing data =========================================================")
-    test_a, test_c, test_m = test_data(x_test, y_test, shefah_model, print_info)
+    test_a, test_c, test_m = test_data(
+        x_test, y_test, shefah_model, print_info)
     return train_a, train_m, validation_a, validation_m, test_a, test_m
 
 
 if __name__ == "__main__":
+    tf.get_logger().setLevel(logging.ERROR)
     testAllCheckpoints = sys.argv[3].lower() == "true"
     print(testAllCheckpoints)
     checkpoints = []
@@ -131,7 +135,8 @@ if __name__ == "__main__":
         for file in find_files(checkpoints_dir, "*.ckpt.data*"):
             checkpoints.append(file.split(".data")[0])
     else:
-        checkpoints = [tf.train.latest_checkpoint(os.path.dirname(checkpoint_pattern))]
+        checkpoints = [tf.train.latest_checkpoint(
+            os.path.dirname(checkpoint_pattern))]
 
     if len(checkpoints) == 0:
         print("No Weights Found")
@@ -144,7 +149,12 @@ if __name__ == "__main__":
             # compile model
             model.compile()
             model.load_weights(checkpoint)
+            testModel = test_model(shefah_model, not testAllCheckpoints)
             print(checkpoint)
-            print(test_model(shefah_model, not testAllCheckpoints))
+
+            print("Accuracy on Training = ", testModel[0])
+            print("Confusion Matrix: ", testModel[1])
+            print("Accuracy on Testing = ", testModel[4])
+            print("Confusion Matrix: ", testModel[5])
             print("===============")
             tf.keras.backend.clear_session()

@@ -221,7 +221,7 @@ def extract_videos(train_paths, train_labels, speaker_path):
     # go through every video of the speaker
     for dir in find_dirs(speaker_path, "[0-9]"):
         label = get_label_from_path(dir)
-        if int(translate_label_to_number(label)) >= 5:
-            continue
+        # if int(translate_label_to_number(label)) >= 5:
+        #     continue
         train_paths.append(dir)
         train_labels.append(translate_label_to_array(label))
