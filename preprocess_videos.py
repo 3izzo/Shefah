@@ -33,7 +33,7 @@ def get_frames_mouth(detector, predictor, frame):
     shape = None
     for k, d in enumerate(dets):
         shape = predictor(frame, d)
-        i = -1
+    i = -1
     if shape is None:  # Detector doesn't detect face, just return as is
         return frame
     mouth_points = []
@@ -59,6 +59,13 @@ def get_frames_mouth(detector, predictor, frame):
     resized_img = cv2.resize(
         src=frame, dsize=new_img_shape, interpolation=cv2.INTER_CUBIC
     )
+    i = -1
+    for part in parts:
+        i += 1
+        if i < 48:  # Only take mouth region
+            continue
+        resized_img[int(part.y * normalize_ratio), int(part.x * normalize_ratio)] = [0,255,0]
+
     mouth_centroid_norm = mouth_centroid * normalize_ratio
 
     mouth_l = int(mouth_centroid_norm[0] - MOUTH_WIDTH / 2)
@@ -131,5 +138,5 @@ if __name__ == "__main__":
 
     Parallel(n_jobs=num_cores)(
         delayed(preproc_speaker)(speaker_index)
-        for speaker_index in range(num_speakers)
+        for speaker_index in range(48,num_speakers)
     )
