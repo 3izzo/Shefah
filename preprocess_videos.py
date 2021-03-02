@@ -29,15 +29,26 @@ def get_frames_mouth(detector, predictor, frame):
 
     normalize_ratio = None
 
-    dets = detector(frame, 1)
+    dets = detector(frame)
     shape = None
     for k, d in enumerate(dets):
-        shape = predictor(frame, d)
-        i = -1
+        if shape == None:
+            shape = predictor(frame, d)
+        else:
+            # print(type(shape.rect))
+            shape_size = shape.rect.area()
+            # print(shape_size)
+            shape_temp = predictor(frame, d)
+            shape_temp_size = shape_temp.rect.area()
+            if shape_temp_size > shape_size:
+                shape = shape_temp
+
+    # print("=========")
     if shape is None:  # Detector doesn't detect face, just return as is
         return frame
     mouth_points = []
     parts = shape.parts()
+    i = -1
     for part in parts:
         i += 1
         if i < 48:  # Only take mouth region
@@ -131,5 +142,5 @@ if __name__ == "__main__":
 
     Parallel(n_jobs=num_cores)(
         delayed(preproc_speaker)(speaker_index)
-        for speaker_index in range(num_speakers)
+        for speaker_index in range(58,num_speakers)
     )
