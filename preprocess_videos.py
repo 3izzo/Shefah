@@ -72,10 +72,10 @@ def get_frames_mouth(detector, predictor, frame):
     )
     mouth_centroid_norm = mouth_centroid * normalize_ratio
 
-    mouth_l = int(mouth_centroid_norm[0] - MOUTH_WIDTH / 2)
-    mouth_r = int(mouth_centroid_norm[0] + MOUTH_WIDTH / 2)
-    mouth_t = int(mouth_centroid_norm[1] - MOUTH_HEIGHT / 2)
-    mouth_b = int(mouth_centroid_norm[1] + MOUTH_HEIGHT / 2)
+    mouth_l = int(int(mouth_centroid_norm[0]) - MOUTH_WIDTH / 2)
+    mouth_r = int(int(mouth_centroid_norm[0]) + MOUTH_WIDTH / 2)
+    mouth_t = int(int(mouth_centroid_norm[1]) - MOUTH_HEIGHT / 2)
+    mouth_b = int(int(mouth_centroid_norm[1]) + MOUTH_HEIGHT / 2)
 
     return resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
 
@@ -142,5 +142,5 @@ if __name__ == "__main__":
 
     Parallel(n_jobs=num_cores)(
         delayed(preproc_speaker)(speaker_index)
-        for speaker_index in range(58,num_speakers)
+        for speaker_index in range(num_speakers)
     )

@@ -161,7 +161,7 @@ def translate_word_to_number(word):
     return res
 
 
-def get_train_validation_test_paths(trainCount,valCount):
+def get_train_validation_test_paths(trainCount, valCount):
     numpy_random.seed(seed)
     speakers_paths = []
     for dir in find_dirs(".\\PreprocessedVideos", "speaker([1-9]|([0-9][0-9]))"):
