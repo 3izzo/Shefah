@@ -69,8 +69,8 @@ def load_video_frames(path):
         i += 1
     else:
         print(
-            "WARNING VIDEO HAS MORE FRAMES THAN THE LIMIT OF %d. Any frame above the limit will be ignored"
-            % max_frame_count
+            "WARNING VIDEO %s HAS MORE FRAMES THAN THE LIMIT OF %d. Any frame above the limit will be ignored"
+            % (name, max_frame_count)
         )
     # padding
     while i < max_frame_count:
