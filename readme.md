@@ -1,3 +1,4 @@
+## The strcutre of the data:
 The input data is structered as follows:
 > Videos\
 >> speaker1\
@@ -14,30 +15,30 @@ The preprocessed data is structered as follows:
 > PreprocessedVideos\
 >> speaker1\
 >>> 0
->>>> frame0.png
->>>> frame1.png  
+>>>> frame0.png\
+>>>> frame1.png
 >>>> ...  
 
->>> 1  
->>>> frame0.png  
->>>> ...  
+>>> 1
+>>>> frame0.png\
+>>>> ...
 
 >>> ...  
 
 >> speaker2\
 >>> 0
->>>> frame0.png
->>>> frame1.png  
->>>> ...  
+>>>> frame0.png\
+>>>> frame1.png
+>>>> ...
 
 >>> 1  
->>>> frame0.png  
->>>> ...  
+>>>> frame0.png \
+>>>> ...
 
->>> ...   
+>>> ... 
 
->> speaker... 
+>> speaker...
         
-
-any videos that dont start thier name with a number will be ignored
-any videos that is longer than
+## notes:
+any videos that don't start their name with a number will be ignored. \
+any video that is longer than a 1 sec and 30 msec, the frames that exceeds the amount will be discraded.
