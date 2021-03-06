@@ -37,7 +37,7 @@ model = shefah_model.model
 
 # compile model
 model.compile(
-    optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08),
+    optimizer=Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08),
     loss={"ctc": lambda y_true, y_pred: y_pred},
 )
 
