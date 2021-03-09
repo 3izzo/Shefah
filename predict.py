@@ -4,7 +4,6 @@ import tensorflow as tf
 from Utilities import *
 from model1 import ShefahModel
 from preprocess_videos import *
-
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
 if gpus:
@@ -78,4 +77,4 @@ decoded_prediction = decode_predict_ctc(y_prediction)
 predicted = decoded_prediction[0]
 predicted_as_numbers = translate_label_to_number(predicted)
 print("===============================================================================")
-print(predicted_as_numbers, predicted)
+print(predicted_as_numbers, translate_word_to_word(predicted))

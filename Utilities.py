@@ -160,6 +160,16 @@ def translate_word_to_number(word):
             best_ratio = ratio
     return res
 
+def translate_word_to_word(word):
+    res = 0
+    best_ratio = 0
+    for key in mapping.keys():
+        value = mapping[key]
+        ratio = fuzz.ratio(word, value)
+        if ratio > best_ratio:
+            res = value
+            best_ratio = ratio
+    return res
 
 def get_train_validation_test_paths(trainCount, valCount):
     numpy_random.seed(seed)
