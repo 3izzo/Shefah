@@ -44,14 +44,23 @@ model.compile(
     loss={"ctc": lambda y_true, y_pred: y_pred},
 )
 
-
-# transfer weights to shefah model
-for layer in model.layers:
-    if layer.name == copy_weights_till_layer:
-        break
-    print(layer.name)
-    layer.set_weights(weights[layer.name])
-    layer.trainable = False
+checkpoint_dir = os.path.dirname(checkpoint_pattern)
+latest = tf.train.latest_checkpoint(checkpoint_dir)
+start_epoch = 0
+if latest:
+    model.load_weights(latest)
+    start_epoch = int("".join(c for c in latest if c.isdigit()))
+    print("-------------------------------------")
+    print("loaded weights from %s" % latest)
+    print("epoch is ", start_epoch)
+else:
+    # transfer weights to shefah model
+    for layer in model.layers:
+        if layer.name == copy_weights_till_layer:
+            break
+        print(layer.name)
+        layer.set_weights(weights[layer.name])
+        layer.trainable = False
 
 
 
