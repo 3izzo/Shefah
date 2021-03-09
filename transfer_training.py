@@ -21,18 +21,7 @@ if gpus:
         print(e)
 
 
-pretrained_model = ShefahModel(output_size=28)
-pretrained_model.model.load_weights(".\\overlapped-weights368.h5")
 
-copy_weights_till_layer = "dense1"
-weights = {}
-for pretrained_layer in pretrained_model.model.layers:
-    if pretrained_layer.name == copy_weights_till_layer:
-        break
-    weights[pretrained_layer.name] = pretrained_layer.get_weights()
-
-# clear gpu memory
-K.clear_session()
 
 # create model
 shefah_model = ShefahModel()
@@ -54,6 +43,18 @@ if latest:
     print("loaded weights from %s" % latest)
     print("epoch is ", start_epoch)
 else:
+    pretrained_model = ShefahModel(output_size=28)
+    pretrained_model.model.load_weights(".\\overlapped-weights368.h5")
+
+    copy_weights_till_layer = "dense1"
+    weights = {}
+    for pretrained_layer in pretrained_model.model.layers:
+        if pretrained_layer.name == copy_weights_till_layer:
+            break
+        weights[pretrained_layer.name] = pretrained_layer.get_weights()
+
+    # clear gpu memory
+    K.clear_session()
     # transfer weights to shefah model
     for layer in model.layers:
         if layer.name == copy_weights_till_layer:
