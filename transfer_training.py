@@ -78,7 +78,7 @@ else:
 start_epoch = 0
 
 train_generator = DataGenerator(
-    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64
+    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=48
 )
 validation_generator = DataGenerator(
     x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
