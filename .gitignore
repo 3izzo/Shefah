@@ -3,4 +3,8 @@ Videos
 /PreprocessedVideos
 /.vscode
 /Checkpoints
+/Checkpointstmp
 /__pycache__
+/GRID PRE
+/GRID
+overlapped-weights368.h5

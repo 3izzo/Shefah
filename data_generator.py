@@ -24,12 +24,13 @@ class DataGenerator(keras.utils.Sequence):
 
     def __len__(self):
         "Denotes the number of batches per epoch"
-        return int(np.floor(len(self.list_videos) / self.batch_size))
+        return int(np.ceil(len(self.list_videos) * 2 / self.batch_size))
 
     def __getitem__(self, index):
         "Generate one batch of data"
         # Generate indexes of the batch
-        indexes = self.indexes[index * self.batch_size : (index + 1) * self.batch_size]
+        indexes = self.indexes[int(
+            index * self.batch_size/2): int((index + 1) * self.batch_size/2)]
 
         # Find list of IDs
         list_videos_temp = [self.list_videos[k] for k in indexes]
@@ -57,17 +58,21 @@ class DataGenerator(keras.utils.Sequence):
         # Initialization
         # print(self.input_shape)
         # print((self.batch_size, *self.input_shape))
-        X = np.empty((self.batch_size, *self.input_shape))
-        y = np.empty((self.batch_size, max_label_length), dtype=int)
-
+        X = np.empty((len(list_videos_temp) * 2, *self.input_shape))
+        y = np.empty((len(list_videos_temp) * 2, max_label_length), dtype=int)
         # Generate data
         for i, ID in enumerate(list_videos_temp):
             # Store sample
-            X[i] = list_videos_temp[i]
-            y[i] = list_labels_temp[i]
+            X[2*i] = load_video_frames(list_videos_temp[i])
+            y[2*i] = list_labels_temp[i]
+            X[2*i+1] = mirror_frames(X[2*i])
+            y[2*i+1] = list_labels_temp[i]
+
             # np.load("data/" + ID + ".npy")
 
             # Store class
             #  = self.labels[ID]
+        random.Random(seed).shuffle(X)
+        random.Random(seed).shuffle(y)
 
         return X, y

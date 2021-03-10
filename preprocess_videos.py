@@ -1,15 +1,10 @@
 import skvideo.io
-import errno
-import sys
 import fnmatch
 import os
 import numpy as np
 import dlib
 import cv2
-
-
-input_videos_dir = ".\\Videos"
-output_videos_dir = ".\\PreprocessedVideos"
+from Utilities import input_videos_dir, output_videos_dir
 
 
 def find_files(directory, pattern):
@@ -34,15 +29,26 @@ def get_frames_mouth(detector, predictor, frame):
 
     normalize_ratio = None
 
-    dets = detector(frame, 1)
+    dets = detector(frame)
     shape = None
     for k, d in enumerate(dets):
-        shape = predictor(frame, d)
-        i = -1
+        if shape == None:
+            shape = predictor(frame, d)
+        else:
+            # print(type(shape.rect))
+            shape_size = shape.rect.area()
+            # print(shape_size)
+            shape_temp = predictor(frame, d)
+            shape_temp_size = shape_temp.rect.area()
+            if shape_temp_size > shape_size:
+                shape = shape_temp
+
+    # print("=========")
     if shape is None:  # Detector doesn't detect face, just return as is
         return frame
     mouth_points = []
     parts = shape.parts()
+    i = -1
     for part in parts:
         i += 1
         if i < 48:  # Only take mouth region
@@ -58,17 +64,18 @@ def get_frames_mouth(detector, predictor, frame):
         normalize_ratio = MOUTH_WIDTH / float(mouth_right - mouth_left)
 
     new_img_shape = (
-        int(frame.shape[1] * normalize_ratio), int(frame.shape[0] * normalize_ratio))
+        int(frame.shape[1] * normalize_ratio),
+        int(frame.shape[0] * normalize_ratio),
+    )
     resized_img = cv2.resize(
-        src=frame,
-        dsize=new_img_shape,
-        interpolation=cv2.INTER_CUBIC)
+        src=frame, dsize=new_img_shape, interpolation=cv2.INTER_CUBIC
+    )
     mouth_centroid_norm = mouth_centroid * normalize_ratio
 
-    mouth_l = int(mouth_centroid_norm[0] - MOUTH_WIDTH / 2)
-    mouth_r = int(mouth_centroid_norm[0] + MOUTH_WIDTH / 2)
-    mouth_t = int(mouth_centroid_norm[1] - MOUTH_HEIGHT / 2)
-    mouth_b = int(mouth_centroid_norm[1] + MOUTH_HEIGHT / 2)
+    mouth_l = int(int(mouth_centroid_norm[0]) - MOUTH_WIDTH / 2)
+    mouth_r = int(int(mouth_centroid_norm[0]) + MOUTH_WIDTH / 2)
+    mouth_t = int(int(mouth_centroid_norm[1]) - MOUTH_HEIGHT / 2)
+    mouth_b = int(int(mouth_centroid_norm[1]) + MOUTH_HEIGHT / 2)
 
     return resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
 
@@ -80,20 +87,60 @@ def make_dir(dir):
         pass
 
 
-make_dir(output_videos_dir)
+def preproc_speaker(speaker_index):
+    from datetime import datetime
+
+    for video_path in find_files(
+        input_videos_dir + "\\speaker" + str(speaker_index + 1), "[0-9].mp4"
+    ):
+        start_time = datetime.now()
+        storage_dir = video_path.replace(input_videos_dir, output_videos_dir).replace(
+            ".mp4", ""
+        )
+        make_dir(storage_dir)
+
+        frame_index = 0
+        for frame in get_video_frames(video_path):
+            cropped_frame = cv2.cvtColor(
+                get_frames_mouth(face_detector, predictor, frame), cv2.COLOR_BGR2RGB
+            )
+
+            cv2.imwrite(
+                "%s\\frame%d.png" % (storage_dir, frame_index),
+                cropped_frame,
+            )
+            frame_index += 1
+
+        delta_time = datetime.now() - start_time
+        print(
+            "Done",
+            storage_dir,
+            "in",
+            delta_time.microseconds / 1000000 + delta_time.seconds,
+            "s",
+        )
+
+
 face_detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(".\\shape_predictor_68_face_landmarks.dat")
-for video_path in find_files(input_videos_dir, "[0-9] [0-9].mp4"):
-    storage_dir = video_path.replace(".mp4", "")
-    storage_dir = storage_dir.replace(input_videos_dir, output_videos_dir)
-    make_dir(storage_dir+"\\unmirrored")
-    make_dir(storage_dir+"\\mirrored")
-    i = 0
-    for frame in get_video_frames(video_path):
+if __name__ == "__main__":
 
-        cropped_frame = cv2.cvtColor(get_frames_mouth(
-            face_detector, predictor, frame), cv2.COLOR_BGR2RGB)
-        mirrored = cv2.flip(cropped_frame, 1)
-        cv2.imwrite("%s\\unmirrored\\frame%d.png" % (storage_dir, i), cropped_frame)
-        cv2.imwrite("%s\\mirrored\\frame%d.png" % (storage_dir, i), mirrored)
-        i += 1
+    def get_number_of_speakers():
+        count = 0
+        for root, dirs, files in os.walk(input_videos_dir):
+            count = len(dirs)
+            break
+        return count
+
+    import multiprocessing
+    from joblib import Parallel, delayed
+
+    num_cores = multiprocessing.cpu_count()
+    num_speakers = get_number_of_speakers()
+    print("cores :", num_cores, " speakers : ", num_speakers)
+    make_dir(output_videos_dir)
+
+    Parallel(n_jobs=num_cores)(
+        delayed(preproc_speaker)(speaker_index)
+        for speaker_index in range(num_speakers)
+    )

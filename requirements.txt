@@ -6,3 +6,4 @@ numpy
 keras
 fuzzywuzzy
 jiwer
+numba
