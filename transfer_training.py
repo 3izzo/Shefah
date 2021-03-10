@@ -36,17 +36,25 @@ model.compile(
 checkpoint_dir = os.path.dirname(checkpoint_pattern)
 latest = tf.train.latest_checkpoint(checkpoint_dir)
 start_epoch = 0
+copy_weights_till_layer = "dense1"
+
 if latest:
     model.load_weights(latest)
     start_epoch = int("".join(c for c in latest if c.isdigit()))
     print("-------------------------------------")
     print("loaded weights from %s" % latest)
     print("epoch is ", start_epoch)
+    for layer in model.layers:
+        if layer.name == copy_weights_till_layer:
+            break
+        layer.trainable = False
 else:
+    # clear gpu memory
+    K.clear_session()
+
     pretrained_model = ShefahModel(output_size=28)
     pretrained_model.model.load_weights(".\\overlapped-weights368.h5")
 
-    copy_weights_till_layer = "dense1"
     weights = {}
     for pretrained_layer in pretrained_model.model.layers:
         if pretrained_layer.name == copy_weights_till_layer:
@@ -59,7 +67,6 @@ else:
     for layer in model.layers:
         if layer.name == copy_weights_till_layer:
             break
-        print(layer.name)
         layer.set_weights(weights[layer.name])
         layer.trainable = False
 
@@ -84,7 +91,7 @@ validation_generator = DataGenerator(
     x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
 )
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200
+    filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=15 * len(train_generator)
 )
 model.fit(
     train_generator,
