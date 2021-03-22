@@ -143,9 +143,9 @@ if __name__ == "__main__":
     else:
         i = 0
         for checkpoint in checkpoints:
-            if i < 40:
-                i +=1
-                continue
+            # if i < 40:
+            #     i +=1
+            #     continue
             # create model
             shefah_model = ShefahModel()
             model = shefah_model.model
