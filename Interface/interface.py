@@ -1,127 +1,222 @@
 from tkinter import *
 import threading
-from PIL import ImageTk, Image 
+from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 import cv2
-import ffmpeg_streaming
 import numpy as np
 import imageio
 from tkinter import ttk
+import time
+
+from numpy.core.records import recarray
+from Displaythread import Displaythread
+
 
 class App:
     def __init__(self, master):
+        self.thread = None
+        self.recording = False
         self.master = master
-        self.video =''
-        self.status = '' #To change the current function of the partial bar
+        self.pac = None
+        self.input_video = []
+        self.status = ""  # To change the current function of the partial bar
 
-        master.title('name')
-        master.config(bg='white')
-        master.minsize(1000,800)
+        master.title("Shefah")
+        master.config(bg="white")
+        master.minsize(900, 600)
 
         # Create Frames to organize widgets in the window
-        self.left_frame = Frame(master, width=700, height=800, bg='white')
-        self.left_frame.pack(side='left', fill='both', padx=10, pady=5, expand=True)
- 
-        self.right_frame = Frame(master, width=300, height=400, bg='white')
-        self.right_frame.pack(side='right', fill='y', padx=10, pady=5, expand=False)
+        self.frame_r = Frame(master, width=300, bg="white")
+        self.frame_r.pack(side="right", fill=Y, padx=2, pady=2)
 
-        self.right_top_frame = Frame(self.right_frame,width=300, height=300,bg='white')
-        self.right_top_frame.pack(side='top', fill='both', padx=10, pady=5, expand=True)
+        self.frame_l = Frame(master, bg="white")
+        self.frame_l.pack(side="left", expand=1, fill=BOTH)
+        Grid.columnconfigure(self.frame_l, 0, weight=1)
+        Grid.columnconfigure(self.frame_l, 1, weight=1)
 
-        self.right_bottom_frame = Frame(self.right_frame,width=300, height=500,bg='white')
-        self.right_bottom_frame.pack(side='bottom', fill='both', padx=10, pady=5, expand=True)
+        Grid.rowconfigure(self.frame_l, 0, weight=1)
+        Grid.rowconfigure(self.frame_l, 2, weight=1)
 
-        self.right_bottom_top_frame = Frame(self.right_bottom_frame,width=300, height=250,bg='white')
-        self.right_bottom_top_frame.pack(side='top', fill='both', padx=10, pady=5, expand=True)
-
-        self.right_bottom_bottom_frame = Frame(self.right_bottom_frame,width=300, height=250,bg='white')
-        self.right_bottom_bottom_frame.pack(side='top', fill='both', padx=10, pady=5, expand=True)
-
-        self.left_top_frame = Frame(self.left_frame,width=700, height=400,bg='white')
-        self.left_top_frame.pack(side='top', fill='both', padx=10, pady=5, expand=True)
-
-        self.left_bottom_frame = Frame(self.left_frame,width=700, height=180,bg='white')
-        self.left_bottom_frame.pack(side='bottom', fill='both', padx=10, pady=5, expand=True)
-
+        self.frame_l_t = Frame(self.frame_l, bg="green")
+        self.frame_l_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_l_t.pack_propagate(False)
         # Where the output should be
-        self.left_mid_frame = Frame(self.left_frame,width=700, height=10,bg='white')
-        self.left_mid_frame.pack(side='bottom', fill='x', padx=10, pady=5, expand=False)
+        self.frame_l_m = Frame(self.frame_l, bg="red")
+        self.frame_l_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
-        self.left_bottom_right_frame = Frame(self.left_bottom_frame,width=100, height=180,bg='white')
-        self.left_bottom_right_frame.pack(side='right', fill='both', padx=10, pady=5, expand=True)
-        self.left_bottom_left_frame = Frame(self.left_bottom_frame,width=100, height=180,bg='white')
-        self.left_bottom_left_frame.pack(side='right', fill='both', padx=10, pady=5, expand=True)
-        
+        self.frame_l_b_l = Frame(self.frame_l, bg="yellow")
+        self.frame_l_b_r = Frame(self.frame_l, bg="blue")
+        self.frame_l_b_l.pack_propagate(False)
+
+        self.frame_l_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_l_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_l_b_r.pack_propagate(False)
+
         # Welcome message
-        self.label = Label(self.left_mid_frame, text='Welcome to Shefah'+'\n'+'Please selelct a file or record a new video.', justify='center', bg='white').pack(side='top', padx=5, pady=5)
- 
-        # Shefah's Logo
-        self.image = Image.open("C:\\Users\\MHK47\\Desktop\\University\\8\\graduation project\\Github\\Shefah\\Shefah\\Interface\\logo.png")
-        self.image = self.image.resize((300, 278), Image.ANTIALIAS)
-        self.img = ImageTk.PhotoImage(self.image)
-        self.panel = Label(self.right_top_frame, image = self.img, bg='white').pack(fill='both', padx=5, pady=5, side='top', expand = False)
+        self.label = Label(
+            self.frame_l_m,
+            text="Welcome to Shefah" + "\n" + "Please selelct a file or record a new video.",
+            justify="center",
+            bg="white",
+        ).pack()
 
-        def stream(path, vid_label):
-            ''' takes a video's path and play the video ''' 
-            self.video = imageio.get_reader(path)
+        # # Shefah's Logo
+        image = Image.open(".\\Interface\\logo.png")
+        image = image.resize((300, 278), Image.ANTIALIAS)
+        self.img = ImageTk.PhotoImage(image)
+        Label(self.frame_r, image=self.img, bg="white").pack(side="top", expand=False)
 
-            for image in self.video.iter_data():
+        # Creating two progress bars to inform the user about the progress of the prediction
+        frame_helper = Frame(self.frame_r, bg="white")
+        frame_helper.pack(side="bottom", pady=8)
+
+        self.partial_progress_bar_label = Label(frame_helper, text="Hello", bg="white")
+        self.partial_progress_bar_label.grid(row=100, sticky=W)
+        self.partial_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
+        self.partial_progress_bar.grid(row=101)
+
+        self.total_progress_bar_label = Label(frame_helper, text="Total Progress:", bg="white")
+        self.total_progress_bar_label.grid(row=102, sticky=W)
+        self.total_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
+        self.total_progress_bar.grid(row=103, sticky=W)
+
+        # Buttons to make actions
+        self.btn_select = Button(frame_helper, text="Select a File", command=self.open_filedialog)
+        self.btn_select.grid(row=0, sticky=W + E, pady=2)
+        self.btn_record = Button(frame_helper, text="Open Camera", command=self.open_camera)
+        self.btn_record.grid(row=1, sticky=W + E, pady=2)
+
+        self.btn_record_start = Button(frame_helper, text="Record", command=self.toggle_recording)
+        self.btn_record_start.grid(row=2, sticky=W + E, pady=2) 
+        self.btn_record_start.grid_remove()
+        self.btn_record_end = Button(frame_helper, text="Stop", command=self.toggle_recording)
+        self.btn_record_end.grid(row=2, sticky=W + E, pady=2)
+        self.btn_record_end.grid_remove()
+
+        self.btn_prcs = Button(frame_helper, text="Start Processing", command=self.process_video, state=DISABLED)
+        self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
+        self.btn_exit = Button(frame_helper, text="Exit", command=quit)
+        self.btn_exit.grid(row=4, sticky=W + E, pady=2)
+
+        # padding
+        Frame(frame_helper, height=16, bg="white").grid(row=10)
+
+    def stream(self, video, vid_label, parent):
+        """ takes a video and play the video """
+        start_time = time.time()
+        event = threading.Event()
+        while True:
+            for image in video:
                 frame = Image.fromarray(image)
-                frame = frame.resize((700,400))
+                h = parent.winfo_height()
+                w = int(h * (frame.width / frame.height))
+                frame = frame.resize((w, h))
                 frame_image = ImageTk.PhotoImage(frame)
                 vid_label.config(image=frame_image)
                 vid_label.image = frame_image
- 
+                end_time = time.time()
+                waiting_time = 1 / 30 - (end_time - start_time)
+                start_time = time.time() + waiting_time
+                if waiting_time > 0:
+                    event.wait(waiting_time)
 
-        def open_filedialog():
-            ''' Open filedialog to let the user choose the file to process '''
-            self.video = fd.askopenfilename()
-            if(self.video != ""):
-                vid_label = Label(self.left_top_frame, bg='black')
-                vid_label.pack(expand=True)
-                thread = threading.Thread(target=stream, args=(self.video,vid_label))
-                thread.daemon = 1
-                thread.start()
-                self.start_processing['state'] = 'normal'
+    def open_filedialog(self):
+        """ Open filedialog to let the user choose the file to process """
+        video_path = fd.askopenfilename()
 
-        def open_camera():
-            ''' Open the user's camera to record a video to process '''
-            self.video = cv2.MyVideoCapture(0)
-            if(self.video != ""):
-                vid_label = Label(self.left_top_frame, bg='black')
-                vid_label.pack(expand=True)
-                thread = threading.Thread(target=stream, args=(self.video,vid_label))
-                thread.daemon = 1
-                thread.start()
-            stream(self.video, vid_label)
-            
-            start_processing['state'] = 'normal'
+        for child in self.frame_l_t.winfo_children():
+            child.destroy()
+        if self.thread != None:
+            self.thread.raise_exception()
 
-        def process_video():
-            ''' Send the video to Shefah's model to process '''
-            # pridict(video)
+        self.input_video = [i for i in imageio.get_reader(video_path).iter_data()]
+        if self.input_video:
+            vid_label = Label(self.frame_l_t, bg="black")
+            vid_label.pack(expand=True, fill=BOTH)
+            self.thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_l_t))
+            self.thread.daemon = 1
+            self.thread.start()
+            self.btn_prcs["state"] = "normal"
 
-        #Creating two progress bars to inform the user about the progress of the prediction
-        self.partial_progress_bar = ttk.Progressbar(self.right_bottom_bottom_frame, orient= HORIZONTAL, length= 300, mode= 'determinate')
-        self.partial_progress_bar.pack(side='bottom', pady=5)
-        self.partial_progress_bar_label = Label(self.right_bottom_bottom_frame, text='{}'.format(self.status), bg='white')
-        self.partial_progress_bar.pack(side='left')
+    def open_camera(self):
+        """ Open the user's camera to record a video to process """
+        for child in self.frame_l_t.winfo_children():
+            child.destroy()
+        if self.thread != None:
+            self.thread.raise_exception()
+
+        self.cap = cv2.VideoCapture(0)
+        if self.cap:
+            vid_label = Label(self.frame_l_t, bg="black")
+            vid_label.pack(expand=True, fill=BOTH)
+            self.thread = Displaythread(target=self.stream_camera_and_capture, args=(self.cap, vid_label, self.frame_l_t))
+            self.thread.daemon = 1
+            self.thread.start()
+
+        self.btn_select["state"] = DISABLED
+        self.btn_prcs["state"] = DISABLED
+        self.btn_record.grid_remove()
+        self.btn_record_start.grid()
+
+    def toggle_recording(self):
         
-        self.total_progress_bar = ttk.Progressbar(self.right_bottom_frame, orient= HORIZONTAL, length= 300, mode= 'determinate').pack(side='bottom', pady=3)
-        self.total_progress_bar_label = Label(self.right_bottom_frame, text='Total Progress:', bg='white').pack(side='left')
+        self.recording = not self.recording
+        
+        if self.recording:
+            self.input_video = []
+            self.btn_record_start.grid_remove()
+            self.btn_record_end.grid()
+        else:
+            self.btn_select["state"] = NORMAL
+            self.btn_record.grid()
+            self.btn_record_end.grid_remove()
+            self.cap.release()
 
-        # Buttons to make actions
-        self.select_a_file = Button(self.right_bottom_top_frame, text="Select a File", command=open_filedialog, width = 20)
-        self.select_a_file.pack(side='top',padx=5, pady=5, ipadx=10)
+            for child in self.frame_l_t.winfo_children():
+                child.destroy()
+            self.thread.raise_exception()
 
-        self.record_a_video = Button(self.right_bottom_top_frame, text="Record a Video", width = 20, command= open_camera)
-        self.record_a_video.pack(side='top',padx=5, pady=5, ipadx=10)
+            if self.input_video:
+                vid_label = Label(self.frame_l_t, bg="black")
+                vid_label.pack(expand=True, fill=BOTH)
+                self.thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_l_t))
+                self.thread.daemon = 1
+                self.thread.start()
+                self.btn_prcs["state"] = "normal"
 
-        self.start_processing = Button(self.right_bottom_top_frame, text="Start Processing", width = 23, command=process_video, state=DISABLED)
-        self.start_processing.pack(side='top',padx=5, pady=5)
 
-        self.exit_shefah = Button(self.right_bottom_top_frame, text="Exit", command=quit, width = 23).pack(side='top',padx=5, pady=5)
+    def stream_camera_and_capture(self, capture, vid_label, parent):
+        """ takes a video and play the video """
+        start_time = time.time()
+        event = threading.Event()
+        while True:
+            _, image = capture.read()
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
+            image = cv2.flip(image, 1)
+
+            if(self.recording):
+                self.input_video.append(image)
+                if(len(self.input_video) > 75):
+                    self.input_video.pop(0)
+
+            frame = Image.fromarray(image)
+            h = parent.winfo_height()
+            w = int(h * (frame.width / frame.height))
+            frame = frame.resize((w, h))
+
+            frame_image = ImageTk.PhotoImage(frame)
+            vid_label.config(image=frame_image)
+            vid_label.image = frame_image
+            end_time = time.time()
+            waiting_time = 1 / 30 - (end_time - start_time)
+            start_time = time.time() + waiting_time
+            if waiting_time > 0:
+                event.wait(waiting_time)
+
+    def process_video():
+        """ Send the video to Shefah's model to process """
+        # pridict(video)
 
 
 root = Tk()
