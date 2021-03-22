@@ -61,10 +61,12 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
     mouth_centroid = np.mean(np_mouth_points[:, -2:], axis=0)
 
     if normalize_ratio is None:
-        mouth_left = np.min(np_mouth_points[:, :-1]) * (1.0 - HORIZONTAL_PAD)
+        mouth_left = np.min(np_mouth_points[:, :-1])
         mouth_right = np.max(np_mouth_points[:, :-1]) * (1.0 + HORIZONTAL_PAD)
-
-        normalize_ratio = MOUTH_WIDTH / float(mouth_right - mouth_left)
+        mouth_left_padded = mouth_left - (mouth_right - mouth_left) * HORIZONTAL_PAD
+        mouth_right_padded = mouth_right + (mouth_right - mouth_left) * HORIZONTAL_PAD
+        
+        normalize_ratio = MOUTH_WIDTH / float(mouth_right_padded - mouth_left_padded)
 
     new_img_shape = (
         int(frame.shape[1] * normalize_ratio),

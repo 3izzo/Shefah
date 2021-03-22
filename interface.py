@@ -273,7 +273,7 @@ class App:
                 frame = frame[:, :, :3]
                 cropped_frame = get_frames_mouth(face_detector, predictor, frame, interface=self)
                 cropped_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2RGB)
-                # cv2.imwrite(".\\G\\%d.png" % i, cropped_frame)
+                # cv2.imwrite(".\\G\\frame%d.png" % i, cropped_frame)
                 video_for_prediction.append(cropped_frame)
                 i += 1
 
