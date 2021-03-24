@@ -11,6 +11,8 @@ from Utilities import *
 from Displaythread import Displaythread
 from predict import *
 
+# add labels to the squares
+# add constrains notifacation 
 
 class App:
     def __init__(self, master):
@@ -92,9 +94,9 @@ class App:
         self.masking_frame.grid(row=100, sticky=NSEW, rowspan=4)
 
         # Buttons to make actions
-        self.btn_select = Button(frame_helper, text="أختر مقطع", command=self.open_filedialog)
+        self.btn_select = Button(frame_helper, text="اختر مقطع", command=self.open_filedialog)
         self.btn_select.grid(row=0, sticky=W + E, pady=2)
-        self.btn_record = Button(frame_helper, text="أفتح الكاميرا", command=self.open_camera)
+        self.btn_record = Button(frame_helper, text="افتح الكاميرا", command=self.open_camera)
         self.btn_record.grid(row=1, sticky=W + E, pady=2)
 
         self.btn_record_start = Button(frame_helper, text="سجل", command=self.toggle_recording)
@@ -104,7 +106,7 @@ class App:
         self.btn_record_end.grid(row=2, sticky=W + E, pady=2)
         self.btn_record_end.grid_remove()
 
-        self.btn_prcs = Button(frame_helper, text="أبدا المعالجة", command=self.process_video, state=DISABLED)
+        self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
         self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
         self.btn_exit = Button(frame_helper, text="خروج", command=quit)
         self.btn_exit.grid(row=4, sticky=W + E, pady=2)
