@@ -38,14 +38,26 @@ def decode_predict_ctc(out, top_paths=5):
     return res
 
 
-(
-    x_train,
-    y_train,
-    x_validation,
-    y_validation,
-    x_test,
-    y_test,
-) = get_train_validation_test_paths(int(sys.argv[1]), int(sys.argv[2]))
+if(sys.argv[1].lower() != "cross"):
+    (
+        x_train,
+        y_train,
+        x_validation,
+        y_validation,
+        x_test,
+        y_test,
+    ) = get_train_validation_test_paths(int(sys.argv[1]), int(sys.argv[2]))
+else:
+    (
+        x_train,
+        y_train,
+        x_validation,
+        y_validation,
+        x_test,
+        y_test,
+    ) = cross_validation(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]))
+    checkpoints_dir = ".\\Cross_Val_Checkpoints\\Fold"+sys.argv[4]
+    checkpoint_pattern = checkpoints_dir + "\\cp-{epoch:04d}.ckpt"
 
 
 def test_data(x, y, shefah_model, print_info=False):
@@ -98,25 +110,24 @@ def test_data(x, y, shefah_model, print_info=False):
 
 def test_model(shefah_model, print_info=False):
 
-    if print_info:
-        print("Training data =======================================================")
-    train_a, train_c, train_m = test_data(
-        x_train, y_train, shefah_model, print_info)
+    # if print_info:
+        # print("Training data =======================================================")
+    train_a, train_c, train_m =(None,None,None) # test_data(x_train, y_train, shefah_model, print_info)
     validation_a, validation_c, validation_m = (None, None, None)
-    if len(x_validation) > 0:
-        if print_info:
-            print(
-                "====================================================================="
-            )
-            print(
-                "====================================================================="
-            )
-            print(
-                "Validation data ====================================================="
-            )
-        validation_a, validation_c, validation_m = test_data(
-            x_validation, y_validation, shefah_model, print_info
-        )
+    # if len(x_validation) > 0:
+    #     if print_info:
+    #         print(
+    #             "====================================================================="
+    #         )
+    #         print(
+    #             "====================================================================="
+    #         )
+    #         print(
+    #             "Validation data ====================================================="
+    #         )
+    #     validation_a, validation_c, validation_m = test_data(
+    #         x_validation, y_validation, shefah_model, print_info
+    #     )
     if print_info:
         print("=====================================================================")
         print("=====================================================================")
@@ -128,7 +139,11 @@ def test_model(shefah_model, print_info=False):
 
 if __name__ == "__main__":
     tf.get_logger().setLevel(logging.ERROR)
-    testAllCheckpoints = sys.argv[3].lower() == "true"
+    if(sys.argv[1].lower() == "cross"):
+        testAllCheckpoints = sys.argv[5].lower() == "true"
+    else:
+        testAllCheckpoints = sys.argv[3].lower() == "true"
+    
     print(testAllCheckpoints)
     checkpoints = []
     if testAllCheckpoints:
@@ -142,9 +157,9 @@ if __name__ == "__main__":
         print("No Weights Found")
     else:
         i = 0
-        for checkpoint in checkpoints:
+        for checkpoint in checkpoints[-5:-1]:
             # if i < 40:
-            #     i +=1
+            #     i += 1
             #     continue
             # create model
             shefah_model = ShefahModel()

@@ -53,7 +53,7 @@ else:
     K.clear_session()
 
     pretrained_model = ShefahModel(output_size=28)
-    pretrained_model.model.load_weights(".\\overlapped-weights368.h5")
+    pretrained_model.model.load_weights(".\\unseen-weights178.h5")
 
     weights = {}
     for pretrained_layer in pretrained_model.model.layers:
@@ -85,7 +85,7 @@ else:
 start_epoch = 0
 
 train_generator = DataGenerator(
-    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=48
+    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=38
 )
 validation_generator = DataGenerator(
     x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16

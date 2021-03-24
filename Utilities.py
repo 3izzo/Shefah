@@ -227,6 +227,55 @@ def get_train_validation_test_paths(trainCount, valCount):
     )
 
 
+def cross_validation(dataCount, numberOfFolds, currnetFold):
+    ''' 
+    Split the data on the number of folds. \n
+    currnet fold should be larger than or equal to 1 \n
+    return a one dataset for a model to train but differs each time you use different currentFold .
+    '''
+    numpy_random.seed(seed)
+    speakers_paths = []
+    for dir in find_dirs(".\\PreprocessedVideos", "speaker([1-9]|([0-9][0-9]))"):
+        speakers_paths.append(dir)
+
+    train_paths = []
+    train_labels = []
+    validation_paths = []
+    validation_labels = []
+
+    test_paths = []
+    test_labels = []
+
+    print("testing speakers:")
+    # choose speakers and all of their videos to the test data
+    start =int(((currnetFold-1)*(dataCount/numberOfFolds)))
+    end = int(currnetFold*(dataCount/numberOfFolds))
+    for i in range(start, end):
+        # choose random speaker from speakers_paths
+        speaker_path = speakers_paths.pop(start)
+        print(speaker_path)
+        extract_videos(test_paths, test_labels, speaker_path)
+
+    print("training speakers:", len(speakers_paths))
+    for speaker_path in speakers_paths:
+        print(speaker_path)
+        extract_videos(train_paths, train_labels, speaker_path)
+
+    random.Random(seed).shuffle(train_paths)
+    random.Random(seed).shuffle(train_labels)
+
+    random.Random(seed).shuffle(test_paths)
+    random.Random(seed).shuffle(test_labels)
+    return (
+        train_paths,
+        train_labels,
+        validation_paths,
+        validation_labels,
+        test_paths,
+        test_labels,
+    )
+
+
 def extract_videos(train_paths, train_labels, speaker_path):
     # go through every video of the speaker
     for dir in find_dirs(speaker_path, "[0-9]"):

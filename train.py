@@ -22,14 +22,26 @@ if gpus:
 
 
 # Get Data
-(
-    x_train,
-    y_train,
-    x_validation,
-    y_validation,
-    x_test,
-    y_test,
-) = get_train_validation_test_paths(int(sys.argv[1]), int(sys.argv[2]))
+if(sys.argv[1].lower() != "cross"):
+    (
+        x_train,
+        y_train,
+        x_validation,
+        y_validation,
+        x_test,
+        y_test,
+    ) = get_train_validation_test_paths(int(sys.argv[1]), int(sys.argv[2]))
+else:
+    (
+        x_train,
+        y_train,
+        x_validation,
+        y_validation,
+        x_test,
+        y_test,
+    ) = cross_validation(int(sys.argv[2]), int(sys.argv[3]),int(sys.argv[4]))
+    checkpoints_dir = ".\\Cross_Val_Checkpoints\\Fold"+sys.argv[4]
+    checkpoint_pattern = checkpoints_dir + "\\cp-{epoch:04d}.ckpt"
 
 # create model
 shefah_model = ShefahModel()
@@ -46,10 +58,11 @@ checkpoint_dir = os.path.dirname(checkpoint_pattern)
 
 
 latest = tf.train.latest_checkpoint(checkpoint_dir)
+print(latest)
 start_epoch = 0
 if latest:
     model.load_weights(latest)
-    start_epoch = int("".join(c for c in latest if c.isdigit()))
+    start_epoch = int("".join(c for c in latest.split('\\')[-1] if c.isdigit()))
     print("-------------------------------------")
     print("loaded weights from %s" % latest)
     print("epoch is ", start_epoch)
