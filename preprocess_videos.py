@@ -5,6 +5,7 @@ import numpy as np
 import dlib
 import cv2
 from Utilities import input_videos_dir, output_videos_dir
+from datetime import datetime
 
 
 def find_files(directory, pattern):
@@ -22,7 +23,7 @@ def get_video_frames(path):
     return frames
 
 
-def get_frames_mouth(detector, predictor, frame):
+def get_frames_mouth(detector, predictor, frame, interface=None):
     MOUTH_WIDTH = 100
     MOUTH_HEIGHT = 50
     HORIZONTAL_PAD = 0.19
@@ -34,6 +35,8 @@ def get_frames_mouth(detector, predictor, frame):
     for k, d in enumerate(dets):
         if shape == None:
             shape = predictor(frame, d)
+            if not interface == None:
+                interface.face_video.append(frame[d.top() : d.bottom(), d.left() : d.right()])
         else:
             # print(type(shape.rect))
             shape_size = shape.rect.area()
@@ -45,7 +48,7 @@ def get_frames_mouth(detector, predictor, frame):
 
     # print("=========")
     if shape is None:  # Detector doesn't detect face, just return as is
-        return frame
+        raise Exception("No Face Detected")
     mouth_points = []
     parts = shape.parts()
     i = -1
@@ -58,24 +61,35 @@ def get_frames_mouth(detector, predictor, frame):
     mouth_centroid = np.mean(np_mouth_points[:, -2:], axis=0)
 
     if normalize_ratio is None:
-        mouth_left = np.min(np_mouth_points[:, :-1]) * (1.0 - HORIZONTAL_PAD)
+        mouth_left = np.min(np_mouth_points[:, :-1])
         mouth_right = np.max(np_mouth_points[:, :-1]) * (1.0 + HORIZONTAL_PAD)
-
-        normalize_ratio = MOUTH_WIDTH / float(mouth_right - mouth_left)
+        mouth_left_padded = mouth_left - (mouth_right - mouth_left) * HORIZONTAL_PAD
+        mouth_right_padded = mouth_right + (mouth_right - mouth_left) * HORIZONTAL_PAD
+        
+        normalize_ratio = MOUTH_WIDTH / float(mouth_right_padded - mouth_left_padded)
 
     new_img_shape = (
         int(frame.shape[1] * normalize_ratio),
         int(frame.shape[0] * normalize_ratio),
     )
-    resized_img = cv2.resize(
-        src=frame, dsize=new_img_shape, interpolation=cv2.INTER_CUBIC
-    )
+    resized_img = cv2.resize(src=frame, dsize=new_img_shape, interpolation=cv2.INTER_CUBIC)
     mouth_centroid_norm = mouth_centroid * normalize_ratio
 
     mouth_l = int(int(mouth_centroid_norm[0]) - MOUTH_WIDTH / 2)
     mouth_r = int(int(mouth_centroid_norm[0]) + MOUTH_WIDTH / 2)
     mouth_t = int(int(mouth_centroid_norm[1]) - MOUTH_HEIGHT / 2)
     mouth_b = int(int(mouth_centroid_norm[1]) + MOUTH_HEIGHT / 2)
+
+    if not interface == None:
+        ROI = resized_img.copy()
+        i = -1
+        for part in parts:
+            i += 1
+            if i < 48:  # Only take mouth region
+                continue
+            ROI[int(part.y * normalize_ratio), int(part.x * normalize_ratio)] = [0, 255, 0]
+
+        interface.ROI_video.append(ROI[mouth_t:mouth_b, mouth_l:mouth_r])
 
     return resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
 
@@ -88,22 +102,15 @@ def make_dir(dir):
 
 
 def preproc_speaker(speaker_index):
-    from datetime import datetime
 
-    for video_path in find_files(
-        input_videos_dir + "\\speaker" + str(speaker_index + 1), "[0-9].mp4"
-    ):
+    for video_path in find_files(input_videos_dir + "\\speaker" + str(speaker_index + 1), "[0-9].mp4"):
         start_time = datetime.now()
-        storage_dir = video_path.replace(input_videos_dir, output_videos_dir).replace(
-            ".mp4", ""
-        )
+        storage_dir = video_path.replace(input_videos_dir, output_videos_dir).replace(".mp4", "")
         make_dir(storage_dir)
 
         frame_index = 0
         for frame in get_video_frames(video_path):
-            cropped_frame = cv2.cvtColor(
-                get_frames_mouth(face_detector, predictor, frame), cv2.COLOR_BGR2RGB
-            )
+            cropped_frame = cv2.cvtColor(get_frames_mouth(face_detector, predictor, frame), cv2.COLOR_BGR2RGB)
 
             cv2.imwrite(
                 "%s\\frame%d.png" % (storage_dir, frame_index),
@@ -140,7 +147,4 @@ if __name__ == "__main__":
     print("cores :", num_cores, " speakers : ", num_speakers)
     make_dir(output_videos_dir)
 
-    Parallel(n_jobs=num_cores)(
-        delayed(preproc_speaker)(speaker_index)
-        for speaker_index in range(num_speakers)
-    )
+    Parallel(n_jobs=num_cores)(delayed(preproc_speaker)(speaker_index) for speaker_index in range(num_speakers))
