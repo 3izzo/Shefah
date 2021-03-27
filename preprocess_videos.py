@@ -26,13 +26,18 @@ def get_video_frames(path):
 def get_frames_mouth(detector, predictor, frame, interface=None):
     MOUTH_WIDTH = 100
     MOUTH_HEIGHT = 50
-    HORIZONTAL_PAD = 0.19
+    HORIZONTAL_PAD = 0.30
 
     normalize_ratio = None
 
     dets = detector(frame)
     shape = None
     for k, d in enumerate(dets):
+        # print(d)
+        h = d.bottom() - d.top()
+        d = dlib.rectangle(d.left() - 10, int(d.top() - h * 0.2), d.right() + 10, int(d.bottom() + h * 0.2))
+        # print(d)
+        print()
         if shape == None:
             shape = predictor(frame, d)
             if not interface == None:
@@ -47,7 +52,7 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
                 shape = shape_temp
 
     # print("=========")
-    if shape is None:  # Detector doesn't detect face, just return as is
+    if shape is None:
         raise Exception("No Face Detected")
     mouth_points = []
     parts = shape.parts()
@@ -62,10 +67,10 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
 
     if normalize_ratio is None:
         mouth_left = np.min(np_mouth_points[:, :-1])
-        mouth_right = np.max(np_mouth_points[:, :-1]) * (1.0 + HORIZONTAL_PAD)
+        mouth_right = np.max(np_mouth_points[:, :-1])
         mouth_left_padded = mouth_left - (mouth_right - mouth_left) * HORIZONTAL_PAD
         mouth_right_padded = mouth_right + (mouth_right - mouth_left) * HORIZONTAL_PAD
-        
+
         normalize_ratio = MOUTH_WIDTH / float(mouth_right_padded - mouth_left_padded)
 
     new_img_shape = (
