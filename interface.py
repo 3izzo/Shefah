@@ -33,86 +33,92 @@ class App:
         master.minsize(900, 600)
 
         # Create Frames to organize widgets in the window
-        self.frame_r = Frame(master, width=300, bg="white")
-        self.frame_r.pack(side="right", fill=Y, padx=2, pady=2)
+        # self.frame_r = Frame(master, width=300, bg="white")
+        # self.frame_r.pack(side="right", fill=Y, padx=2, pady=2)
 
-        self.frame_l = Frame(master, bg="white")
-        self.frame_l.pack(side="left", expand=1, fill=BOTH)
-        Grid.columnconfigure(self.frame_l, 0, weight=1)
-        Grid.columnconfigure(self.frame_l, 1, weight=1)
+        self.frame = Frame(master, bg="white")
+        self.frame.pack(side="left", expand=1, fill=BOTH)
+        Grid.columnconfigure(self.frame, 0, weight=1)
+        Grid.columnconfigure(self.frame, 1, weight=1)
 
-        Grid.rowconfigure(self.frame_l, 0, weight=1)
-        Grid.rowconfigure(self.frame_l, 2, weight=1)
+        Grid.rowconfigure(self.frame, 0, weight=1)
+        Grid.rowconfigure(self.frame, 2, weight=1)
 
-        self.frame_l_t = Frame(self.frame_l, bg="green")
-        self.frame_l_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
-        self.frame_l_t.pack_propagate(False)
+        self.frame_t = Frame(self.frame, bg="green")
+        self.frame_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_t.pack_propagate(False)
         # Where the output should be
-        self.frame_l_m = Frame(self.frame_l, bg="red")
-        self.frame_l_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_m = Frame(self.frame, bg="red")
+        self.frame_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
-        self.frame_l_b_l = Frame(self.frame_l, bg="yellow")
-        self.frame_l_b_r = Frame(self.frame_l, bg="blue")
-        self.frame_l_b_l.pack_propagate(False)
+        self.frame_b_l = Frame(self.frame, bg="yellow")
+        self.frame_b_r = Frame(self.frame, bg="blue")
+        self.frame_b_l.pack_propagate(False)
 
-        self.frame_l_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
-        self.frame_l_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
-        self.frame_l_b_r.pack_propagate(False)
+        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_b_r.pack_propagate(False)
+
+        self.frame_m_b = Frame(self.frame_m)
+        self.frame_m_b.pack(side=TOP)
+        Grid.columnconfigure(self.frame_m_b, 0, weight=1)
+        Grid.columnconfigure(self.frame_m_b, 1, weight=1)
+        Grid.columnconfigure(self.frame_m_b, 2, weight=1)
 
         # Welcome message
-        self.label = Label(
-            self.frame_l_m,
-            text="مرحبا بك في شفه" + "\n" + "أختر مقطع أو سجله.",
-            justify="center",
-            bg="white",
-        )
-        self.label.pack()
+        # self.label = Label(
+        #     self.frame_m,
+        #     text="مرحبا بك في شفه" + "\n" + "أختر مقطع أو سجله.",
+        #     justify="center",
+        #     bg="white",
+        # )
+        # self.label.pack()
 
         # # Shefah's Logo
-        image = Image.open(".\\logo.png")
-        image = image.resize((300, 278), Image.ANTIALIAS)
-        self.img = ImageTk.PhotoImage(image)
-        Label(self.frame_r, image=self.img, bg="white").pack(side="top", expand=False)
+        # image = Image.open(".\\logo.png")
+        # image = image.resize((300, 278), Image.ANTIALIAS)
+        # self.img = ImageTk.PhotoImage(image)
+        # Label(self.frame_r, image=self.img, bg="white").pack(side="top", expand=False)
 
         # Creating two progress bars to inform the user about the progress of the prediction
-        frame_helper = Frame(self.frame_r, bg="orange")
-        frame_helper.pack(side="bottom", pady=8)
+        # frame_helper = Frame(self.frame_r, bg="orange")
+        # frame_helper.pack(side="bottom", pady=8)
 
-        self.partial_progress_bar_label = Label(frame_helper, text="Hello", bg="white")
-        self.partial_progress_bar_label.grid(row=100, sticky=W)
-        self.partial_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
-        self.partial_progress_bar.grid(row=101)
+        # self.partial_progress_bar_label = Label(frame_helper, text="Hello", bg="white")
+        # self.partial_progress_bar_label.grid(row=100, sticky=W)
+        # self.partial_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
+        # self.partial_progress_bar.grid(row=101)
 
-        self.total_progress_bar_label = Label(frame_helper, text="Total Progress:", bg="white")
-        self.total_progress_bar_label.grid(row=102, sticky=W)
-        self.total_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
-        self.total_progress_bar.grid(row=103, sticky=W)
+        # self.total_progress_bar_label = Label(frame_helper, text="Total Progress:", bg="white")
+        # self.total_progress_bar_label.grid(row=102, sticky=W)
+        # self.total_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
+        # self.total_progress_bar.grid(row=103, sticky=W)
 
-        self.masking_frame = Frame(frame_helper, bg="white")
-        self.masking_frame.lift()
-        self.masking_frame.grid(row=100, sticky=NSEW, rowspan=4)
+        # self.masking_frame = Frame(frame_helper, bg="white")
+        # self.masking_frame.lift()
+        # self.masking_frame.grid(row=100, sticky=NSEW, rowspan=4)
 
         # Buttons to make actions
-        self.btn_select = Button(frame_helper, text="اختر مقطع", command=self.open_filedialog)
-        self.btn_select.grid(row=0, sticky=W + E, pady=2)
-        self.btn_record = Button(frame_helper, text="افتح الكاميرا", command=self.open_camera)
-        self.btn_record.grid(row=1, sticky=W + E, pady=2)
+        self.btn_select = Button(self.frame_m_b, text="اختر مقطع", command=self.open_filedialog)
+        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=2)
+        self.btn_record = Button(self.frame_m_b, text="افتح الكاميرا", command=self.open_camera)
+        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=2)
 
-        self.btn_record_start = Button(frame_helper, text="سجل", command=self.toggle_recording)
-        self.btn_record_start.grid(row=2, sticky=W + E, pady=2)
+        self.btn_record_start = Button(self.frame_m_b, text="سجل", command=self.toggle_recording, width = 8)
+        self.btn_record_start.grid(column = 1, row=0, sticky=NSEW, padx=2)
         self.btn_record_start.grid_remove()
-        self.btn_record_end = Button(frame_helper, text="توقف", command=self.toggle_recording)
-        self.btn_record_end.grid(row=2, sticky=W + E, pady=2)
+        self.btn_record_end = Button(self.frame_m_b, text="توقف", command=self.toggle_recording, width = 8)
+        self.btn_record_end.grid(column = 2, row=0, sticky=NSEW, padx=2)
         self.btn_record_end.grid_remove()
 
-        self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
-        self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
-        self.btn_exit = Button(frame_helper, text="خروج", command=quit)
-        self.btn_exit.grid(row=4, sticky=W + E, pady=2)
+        # self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
+        # self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
+        # self.btn_exit = Button(frame_helper, text="خروج", command=quit)
+        # self.btn_exit.grid(row=4, sticky=W + E, pady=2)
 
         # padding
-        Frame(frame_helper, height=16, bg="white").grid(row=10)
+        # Frame(frame_helper, height=16, bg="white").grid(row=10)
 
     def stream(self, video, vid_label, parent):
         """ takes a video and play the video """
@@ -138,89 +144,95 @@ class App:
         """ Open filedialog to let the user choose the file to process """
         video_path = fd.askopenfilename()
 
-        for child in self.frame_l_t.winfo_children():
+        for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
             self.input_thread.raise_exception()
 
-        for child in self.frame_l_b_l.winfo_children():
+        for child in self.frame_b_l.winfo_children():
             child.destroy()
         if self.face_thread != None:
             self.face_thread.raise_exception()
 
-        for child in self.frame_l_b_r.winfo_children():
+        for child in self.frame_b_r.winfo_children():
             child.destroy()
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
 
         self.input_video = [i for i in imageio.get_reader(video_path).iter_data()]
         if self.input_video:
-            vid_label = Label(self.frame_l_t, bg="black")
+            vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_l_t))
+            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
             self.input_thread.daemon = 1
             self.input_thread.start()
-            self.btn_prcs["state"] = "normal"
+            self.process_video()
+            # self.btn_prcs["state"] = "normal"
 
     def open_camera(self):
         """ Open the user's camera to record a video to process """
-        for child in self.frame_l_t.winfo_children():
+        for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
             self.input_thread.raise_exception()
 
-        for child in self.frame_l_b_l.winfo_children():
+        for child in self.frame_b_l.winfo_children():
             child.destroy()
         if self.face_thread != None:
             self.face_thread.raise_exception()
 
-        for child in self.frame_l_b_r.winfo_children():
+        for child in self.frame_b_r.winfo_children():
             child.destroy()
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
 
         self.cap = cv2.VideoCapture(0)
         if self.cap:
-            vid_label = Label(self.frame_l_t, bg="black")
+            vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
             self.input_thread = Displaythread(
-                target=self.stream_camera_and_capture, args=(self.cap, vid_label, self.frame_l_t)
+                target=self.stream_camera_and_capture, args=(self.cap, vid_label, self.frame_t)
             )
             self.input_thread.daemon = 1
             self.input_thread.start()
 
-        self.btn_select["state"] = DISABLED
-        self.btn_prcs["state"] = DISABLED
+        self.btn_select.grid(column=0, row=0, sticky=W + E, pady=2)
+        # self.btn_prcs["state"] = DISABLED
         self.btn_record.grid_remove()
         self.btn_record_start.grid()
+        self.btn_record_end.grid()
+        self.btn_record_end["state"] = DISABLED
+        
 
     def toggle_recording(self):
 
         self.recording = not self.recording
 
         if self.recording:
+            self.btn_select["state"] = DISABLED
             self.input_video = []
-            self.btn_record_start.grid_remove()
-            self.btn_record_end.grid()
+            self.btn_record_start["state"] = DISABLED
+            self.btn_record_end["state"] = NORMAL
+            
         else:
             self.btn_select["state"] = NORMAL
             self.btn_record.grid()
             self.btn_record_end.grid_remove()
             self.cap.release()
 
-            for child in self.frame_l_t.winfo_children():
+            for child in self.frame_t.winfo_children():
                 child.destroy()
             self.input_thread.raise_exception()
 
             if self.input_video:
-                vid_label = Label(self.frame_l_t, bg="black")
+                vid_label = Label(self.frame_t, bg="black")
                 vid_label.pack(expand=True, fill=BOTH)
                 self.input_thread = Displaythread(
-                    target=self.stream, args=(self.input_video, vid_label, self.frame_l_t)
+                    target=self.stream, args=(self.input_video, vid_label, self.frame_t)
                 )
                 self.input_thread.daemon = 1
                 self.input_thread.start()
-                self.btn_prcs["state"] = "normal"
+                # self.btn_prcs["state"] = "normal"
 
     def stream_camera_and_capture(self, capture, vid_label, parent):
         """ takes a video and play the video """
@@ -251,19 +263,19 @@ class App:
                 event.wait(waiting_time)
 
     def process_video(self):
-        self.btn_prcs["state"] = DISABLED
-
+        # self.btn_prcs["state"] = DISABLED
+        
         self.face_video = []
-        vid_label = Label(self.frame_l_b_l, bg="black")
+        vid_label = Label(self.frame_b_l, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.face_thread = Displaythread(target=self.stream, args=(self.face_video, vid_label, self.frame_l_t))
+        self.face_thread = Displaythread(target=self.stream, args=(self.face_video, vid_label, self.frame_t))
         self.face_thread.daemon = 1
         self.face_thread.start()
 
         self.ROI_video = []
-        vid_label = Label(self.frame_l_b_r, bg="black")
+        vid_label = Label(self.frame_b_r, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.ROI_thread = Displaythread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_l_t))
+        self.ROI_thread = Displaythread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_t))
         self.ROI_thread.daemon = 1
         self.ROI_thread.start()
 
