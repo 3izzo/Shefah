@@ -12,7 +12,8 @@ from Displaythread import Displaythread
 from predict import *
 
 # add labels to the squares
-# add constrains notifacation 
+# add constrains notifacation
+
 
 class App:
     def __init__(self, master):
@@ -121,8 +122,13 @@ class App:
         while True:
             for image in video:
                 frame = Image.fromarray(image)
-                h = parent.winfo_height()
+                h = vid_label.winfo_height()
                 w = int(h * (frame.width / frame.height))
+                parent_width = vid_label.winfo_width()
+                if w > parent_width:
+                    ratio = parent_width / w
+                    h = int(h * ratio)
+                    w = int(w * ratio)
                 frame = frame.resize((w, h))
                 frame_image = ImageTk.PhotoImage(frame)
                 vid_label.config(image=frame_image)
@@ -284,7 +290,6 @@ class App:
                 i += 1
 
             video_for_prediction = np.array([video_for_prediction]).astype(np.float32) / 255
-            print(video_for_prediction)
             shefah_model = load_model()
             (predicted, predicted_as_number) = predict_lip(video_for_prediction, shefah_model)
             print(predicted_as_number)
