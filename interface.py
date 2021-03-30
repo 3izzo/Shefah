@@ -146,8 +146,6 @@ class App:
         self.partial_progress_bar_label.grid_remove()
         self.partial_progress_bar.grid_remove()
 
-
-
         # self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
         # self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
         # self.btn_exit = Button(frame_helper, text="خروج", command=quit)
@@ -178,6 +176,8 @@ class App:
 
     def open_filedialog(self):
         """ Open filedialog to let the user choose the file to process """
+        messagebox.showwarning(
+            "تنبيه", "عند اختيار المقطع يجب ان يكون هناك شخص واحد فقط وجهه واضح وشفتيه ايضا. ينطق رقم واحد بين 0-9 بشكل واضح. ولا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين",)
         video_path = fd.askopenfilename()
 
         for child in self.frame_t.winfo_children():
@@ -209,6 +209,8 @@ class App:
 
     def open_camera(self):
         """ Open the user's camera to record a video to process """
+        messagebox.showwarning(
+            "تنبيه", "عند تسجيل المقطع يجب ان يكون هناك شخص واحد فقط وجهه واضح وشفتيه ايضا. ينطق رقم واحد بين 0-9 بشكل واضح. ولا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين",)
         for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
