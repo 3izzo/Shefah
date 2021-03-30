@@ -1,10 +1,13 @@
 from tkinter import *
 import threading
+import tkinter
 from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 import cv2
 import imageio
 from tkinter import ttk
+from tkinter import messagebox
+import tkinter.font as font
 import time
 from preprocess_videos import get_frames_mouth, face_detector, predictor
 from Utilities import *
@@ -12,7 +15,8 @@ from Displaythread import Displaythread
 from predict import *
 
 # add labels to the squares
-# add constrains notifacation 
+# add constrains notifacation
+
 
 class App:
     def __init__(self, master):
@@ -27,6 +31,8 @@ class App:
         self.face_video = []
         self.ROI_video = []
         self.status = ""  # To change the current function of the partial bar
+        self.text_size = font.Font(size=14)
+        self.shefah_model = load_model()
 
         master.title("Shefah")
         master.config(bg="white")
@@ -44,23 +50,27 @@ class App:
         Grid.rowconfigure(self.frame, 0, weight=1)
         Grid.rowconfigure(self.frame, 2, weight=1)
 
-        self.frame_t = Frame(self.frame, bg="green")
-        self.frame_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_t = Frame(self.frame, bg="grey")
+        self.frame_t.grid(row=0, column=0, padx=8, pady=8,
+                          columnspan=2, sticky=N + S + E + W)
         self.frame_t.pack_propagate(False)
         # Where the output should be
-        self.frame_m = Frame(self.frame, bg="red")
-        self.frame_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_m = Frame(self.frame, bg="white")
+        self.frame_m.grid(row=1, column=0, padx=8, pady=8,
+                          columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
-        self.frame_b_l = Frame(self.frame, bg="yellow")
-        self.frame_b_r = Frame(self.frame, bg="blue")
+        self.frame_b_l = Frame(self.frame, bg="grey")
+        self.frame_b_r = Frame(self.frame, bg="grey")
         self.frame_b_l.pack_propagate(False)
 
-        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
-        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8,
+                            columnspan=1, sticky=N + S + E + W)
+        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8,
+                            columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.pack_propagate(False)
 
-        self.frame_m_b = Frame(self.frame_m)
+        self.frame_m_b = Frame(self.frame_m, bg="white")
         self.frame_m_b.pack(side=TOP)
         Grid.columnconfigure(self.frame_m_b, 0, weight=1)
         Grid.columnconfigure(self.frame_m_b, 1, weight=1)
@@ -85,32 +95,58 @@ class App:
         # frame_helper = Frame(self.frame_r, bg="orange")
         # frame_helper.pack(side="bottom", pady=8)
 
-        # self.partial_progress_bar_label = Label(frame_helper, text="Hello", bg="white")
-        # self.partial_progress_bar_label.grid(row=100, sticky=W)
-        # self.partial_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
-        # self.partial_progress_bar.grid(row=101)
-
-        # self.total_progress_bar_label = Label(frame_helper, text="Total Progress:", bg="white")
-        # self.total_progress_bar_label.grid(row=102, sticky=W)
-        # self.total_progress_bar = ttk.Progressbar(frame_helper, orient=HORIZONTAL, length=278, mode="determinate")
-        # self.total_progress_bar.grid(row=103, sticky=W)
-
         # self.masking_frame = Frame(frame_helper, bg="white")
         # self.masking_frame.lift()
         # self.masking_frame.grid(row=100, sticky=NSEW, rowspan=4)
 
         # Buttons to make actions
-        self.btn_select = Button(self.frame_m_b, text="اختر مقطع", command=self.open_filedialog)
-        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=2)
-        self.btn_record = Button(self.frame_m_b, text="افتح الكاميرا", command=self.open_camera)
-        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=2)
+        self.btn_select = Button(
+            self.frame_m_b, text="اختر مقطع", command=self.open_filedialog)
+        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=12)
+        self.btn_record = Button(
+            self.frame_m_b, text="افتح الكاميرا", command=self.open_camera)
+        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=4)
 
-        self.btn_record_start = Button(self.frame_m_b, text="سجل", command=self.toggle_recording, width = 8)
-        self.btn_record_start.grid(column = 1, row=0, sticky=NSEW, padx=2)
+        self.btn_record['font'] = self.btn_select['font'] = self.text_size
+
+        self.btn_record_start = Button(
+            self.frame_m_b, text="سجل", command=self.toggle_recording, width=8)
+        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=12)
         self.btn_record_start.grid_remove()
-        self.btn_record_end = Button(self.frame_m_b, text="توقف", command=self.toggle_recording, width = 8)
-        self.btn_record_end.grid(column = 2, row=0, sticky=NSEW, padx=2)
+        self.btn_record_end = Button(
+            self.frame_m_b, text="توقف", command=self.toggle_recording, width=8)
+        self.btn_record_end.grid(column=2, row=0, sticky=NSEW, padx=4)
         self.btn_record_end.grid_remove()
+
+        self.btn_record_start['font'] = self.btn_record_end['font'] = self.text_size
+
+        # progress bars
+        self.partial_progress_bar_label = Label(
+            self.frame, text="", bg="white")
+        self.partial_progress_bar_label.grid(
+            row=100, columnspan=2, padx=4, sticky=E)
+        self.partial_progress_bar = ttk.Progressbar(
+            self.frame, orient=HORIZONTAL, mode="determinate")
+        self.partial_progress_bar.grid(
+            row=101, columnspan=2, padx=8, sticky=W + E)
+
+        self.total_progress_bar_label = Label(
+            self.frame, text="نسبة الإنجاز", bg="white")
+        self.total_progress_bar_label.grid(
+            row=102, columnspan=2, padx=4, sticky=E)
+        self.total_progress_bar = ttk.Progressbar(
+            self.frame, orient=HORIZONTAL, mode="determinate")
+        self.total_progress_bar.grid(
+            row=103, columnspan=2, padx=8, pady=4, sticky=W + E)
+
+        self.total_progress_bar_label['font'] = self.partial_progress_bar_label['font'] = self.text_size
+
+        self.total_progress_bar_label.grid_remove()
+        self.total_progress_bar.grid_remove()
+        self.partial_progress_bar_label.grid_remove()
+        self.partial_progress_bar.grid_remove()
+
+
 
         # self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
         # self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
@@ -159,11 +195,13 @@ class App:
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
 
-        self.input_video = [i for i in imageio.get_reader(video_path).iter_data()]
+        self.input_video = [
+            i for i in imageio.get_reader(video_path).iter_data()]
         if self.input_video:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
+            self.input_thread = Displaythread(target=self.stream, args=(
+                self.input_video, vid_label, self.frame_t))
             self.input_thread.daemon = 1
             self.input_thread.start()
             self.process_video()
@@ -191,7 +229,8 @@ class App:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
             self.input_thread = Displaythread(
-                target=self.stream_camera_and_capture, args=(self.cap, vid_label, self.frame_t)
+                target=self.stream_camera_and_capture, args=(
+                    self.cap, vid_label, self.frame_t)
             )
             self.input_thread.daemon = 1
             self.input_thread.start()
@@ -202,7 +241,6 @@ class App:
         self.btn_record_start.grid()
         self.btn_record_end.grid()
         self.btn_record_end["state"] = DISABLED
-        
 
     def toggle_recording(self):
 
@@ -213,7 +251,7 @@ class App:
             self.input_video = []
             self.btn_record_start["state"] = DISABLED
             self.btn_record_end["state"] = NORMAL
-            
+
         else:
             self.btn_select["state"] = NORMAL
             self.btn_record.grid()
@@ -228,7 +266,8 @@ class App:
                 vid_label = Label(self.frame_t, bg="black")
                 vid_label.pack(expand=True, fill=BOTH)
                 self.input_thread = Displaythread(
-                    target=self.stream, args=(self.input_video, vid_label, self.frame_t)
+                    target=self.stream, args=(
+                        self.input_video, vid_label, self.frame_t)
                 )
                 self.input_thread.daemon = 1
                 self.input_thread.start()
@@ -264,28 +303,40 @@ class App:
 
     def process_video(self):
         # self.btn_prcs["state"] = DISABLED
-        
+        self.total_progress_bar_label.grid()
+        self.total_progress_bar.grid()
+        self.partial_progress_bar_label.grid()
+        self.partial_progress_bar.grid()
+
         self.face_video = []
         vid_label = Label(self.frame_b_l, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.face_thread = Displaythread(target=self.stream, args=(self.face_video, vid_label, self.frame_t))
+        self.face_thread = Displaythread(target=self.stream, args=(
+            self.face_video, vid_label, self.frame_t))
         self.face_thread.daemon = 1
         self.face_thread.start()
 
         self.ROI_video = []
         vid_label = Label(self.frame_b_r, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.ROI_thread = Displaythread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_t))
+        self.ROI_thread = Displaythread(target=self.stream, args=(
+            self.ROI_video, vid_label, self.frame_t))
         self.ROI_thread.daemon = 1
         self.ROI_thread.start()
 
         def inner_func():
+            time.sleep(0.5)
             i = 0
             video_for_prediction = []
-            print("preprocessing video")
+            self.partial_progress_bar_label['text'] = "معالجة"
+            self.partial_progress_bar['value'] = 10
             for frame in self.input_video:
                 frame = frame[:, :, :3]
-                cropped_frame = get_frames_mouth(face_detector, predictor, frame, interface=self)
+                cropped_frame = get_frames_mouth(
+                    face_detector, predictor, frame, interface=self)
+
+                self.partial_progress_bar['value'] += i
+
                 cropped_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2RGB)
                 # cv2.imwrite(".\\G\\frame%d.png" % i, cropped_frame)
                 video_for_prediction.append(cropped_frame)
@@ -294,13 +345,30 @@ class App:
             while i < max_frame_count:
                 video_for_prediction.append(np.zeros((frame_h, frame_w, 3)))
                 i += 1
+            self.partial_progress_bar['value'] = 100
+            self.total_progress_bar['value'] = 25
+            self.partial_progress_bar_label['text'] = "تحميل النموذج"
+            self.partial_progress_bar['value'] = 10
+            video_for_prediction = np.array(
+                [video_for_prediction]).astype(np.float32) / 255
+            self.partial_progress_bar['value'] = 50
+            # shefah_model = load_model()
+            self.partial_progress_bar['value'] = 100
 
-            video_for_prediction = np.array([video_for_prediction]).astype(np.float32) / 255
-            print(video_for_prediction)
-            shefah_model = load_model()
-            (predicted, predicted_as_number) = predict_lip(video_for_prediction, shefah_model)
-            print(predicted_as_number)
-            self.label["text"] = "الرقم المنطوق هو: " + predicted_as_number
+            self.total_progress_bar['value'] = 75
+
+            self.partial_progress_bar_label['text'] = "يتوقع"
+            self.partial_progress_bar['value'] = 30
+            (predicted, predicted_as_number) = predict_lip(
+                video_for_prediction, self.shefah_model)
+            self.partial_progress_bar['value'] = 100
+
+            self.partial_progress_bar_label['text'] = "انتهى"
+
+            self.total_progress_bar['value'] = 100
+
+            messagebox.showinfo(
+                "الرقم المتوقع", "الرقم المنطوق هو: %s" % predicted_as_number)
 
         if self.processing_thread != None:
             self.processing_thread.raise_exception()
@@ -311,5 +379,5 @@ class App:
 
 root = Tk()
 my_gui = App(root)
-root.call("wm", "iconphoto", root._w, PhotoImage(file=".\\logo.png"))
+# root.call("wm", "iconphoto", root._w, PhotoImage(file=".\\logo.png"))
 root.mainloop()
