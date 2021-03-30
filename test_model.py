@@ -157,7 +157,7 @@ if __name__ == "__main__":
         print("No Weights Found")
     else:
         i = 0
-        for checkpoint in checkpoints[-5:-1]:
+        for checkpoint in checkpoints[-5:]:
             # if i < 40:
             #     i += 1
             #     continue
