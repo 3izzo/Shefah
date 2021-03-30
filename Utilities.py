@@ -73,9 +73,7 @@ def load_video_frames(path):
             % (name, max_frame_count)
         )
     # padding
-    while i < max_frame_count:
-        frames.append(np.zeros((frame_h, frame_w, 3)))
-        i += 1
+    frames = randomly_duplicate_first_frame(frames)
     # normalize the frame
     try:
         res = np.array(frames).astype(np.float32) / 255
@@ -92,6 +90,22 @@ def mirror_frames(frames):
         mirrored.append(cv2.flip(frame, 1))
         # cv2.imshow(mirrored)
     return mirrored
+
+
+zeros_frame = np.zeros((frame_h, frame_w, 3))
+
+
+def randomly_duplicate_first_frame(frames):
+
+    if len(frames) >= max_frame_count:
+        return frames
+    # frames = frames.tolist()
+    time_to_duplicate = np.random.randint(1, max_frame_count - len(frames))
+    x = np.array([frames[0]] * time_to_duplicate)
+    y = np.array([zeros_frame] * (max_frame_count - time_to_duplicate - len(frames)))
+    frames = np.concatenate([x, frames, y])
+
+    return frames
 
 
 def find_dirs(directory, pattern):
@@ -160,6 +174,7 @@ def translate_word_to_number(word):
             best_ratio = ratio
     return res
 
+
 def translate_word_to_word(word):
     res = 0
     best_ratio = 0
@@ -170,6 +185,7 @@ def translate_word_to_word(word):
             res = value
             best_ratio = ratio
     return res
+
 
 def get_train_validation_test_paths(trainCount, valCount):
     numpy_random.seed(seed)
@@ -228,11 +244,11 @@ def get_train_validation_test_paths(trainCount, valCount):
 
 
 def cross_validation(dataCount, numberOfFolds, currnetFold):
-    ''' 
+    """
     Split the data on the number of folds. \n
     currnet fold should be larger than or equal to 1 \n
     return a one dataset for a model to train but differs each time you use different currentFold .
-    '''
+    """
     numpy_random.seed(seed)
     speakers_paths = []
     for dir in find_dirs(".\\PreprocessedVideos", "speaker([1-9]|([0-9][0-9]))"):
@@ -248,8 +264,8 @@ def cross_validation(dataCount, numberOfFolds, currnetFold):
 
     print("testing speakers:")
     # choose speakers and all of their videos to the test data
-    start =int(((currnetFold-1)*(dataCount/numberOfFolds)))
-    end = int(currnetFold*(dataCount/numberOfFolds))
+    start = int(((currnetFold - 1) * (dataCount / numberOfFolds)))
+    end = int(currnetFold * (dataCount / numberOfFolds))
     for i in range(start, end):
         # choose random speaker from speakers_paths
         speaker_path = speakers_paths.pop(start)
