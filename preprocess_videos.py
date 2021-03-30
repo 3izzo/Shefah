@@ -26,7 +26,7 @@ def get_video_frames(path):
 def get_frames_mouth(detector, predictor, frame, interface=None):
     MOUTH_WIDTH = 100
     MOUTH_HEIGHT = 50
-    HORIZONTAL_PAD = 0.30
+    HORIZONTAL_PAD = 0.6
 
     normalize_ratio = None
 
@@ -35,9 +35,9 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
     for k, d in enumerate(dets):
         # print(d)
         h = d.bottom() - d.top()
-        d = dlib.rectangle(d.left() - 10, int(d.top() - h * 0.2), d.right() + 10, int(d.bottom() + h * 0.2))
+        # d = dlib.rectangle(d.left() - 10, int(d.top() - h * 0.2), d.right() + 10, int(d.bottom() + h * 0.2))
         # print(d)
-        print()
+        # print()
         if shape == None:
             shape = predictor(frame, d)
             if not interface == None:
