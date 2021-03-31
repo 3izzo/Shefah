@@ -81,10 +81,20 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
     mouth_centroid_norm = mouth_centroid * normalize_ratio
 
     mouth_l = int(int(mouth_centroid_norm[0]) - MOUTH_WIDTH / 2)
-    mouth_r = int(int(mouth_centroid_norm[0]) + MOUTH_WIDTH / 2)
-    mouth_t = int(int(mouth_centroid_norm[1]) - MOUTH_HEIGHT / 2)
-    mouth_b = int(int(mouth_centroid_norm[1]) + MOUTH_HEIGHT / 2)
+    mouth_r = mouth_l + MOUTH_WIDTH
+    if mouth_l < 0:
+        mouth_l = 0
+        mouth_r = MOUTH_WIDTH
+        if mouth_r > resized_img.shape[1]:
+            return
+    if mouth_r > resized_img.shape[1]:
+        mouth_r = resized_img.shape[1]
+        mouth_l = mouth_r - MOUTH_WIDTH
+        if mouth_l < 0:
+            return
 
+    mouth_t = int(int(mouth_centroid_norm[1]) - MOUTH_HEIGHT / 2)
+    mouth_b = mouth_t + MOUTH_HEIGHT
     if not interface == None:
         ROI = resized_img.copy()
         i = -1
@@ -96,7 +106,15 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
 
         interface.ROI_video.append(ROI[mouth_t:mouth_b, mouth_l:mouth_r])
 
-    return resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
+    # if not mouth_b - mouth_t == MOUTH_HEIGHT:
+    #     print("math is broken", mouth_t, mouth_b, mouth_r, mouth_l)
+    # if not mouth_r - mouth_l == MOUTH_WIDTH:
+    #     print("math is broken", mouth_t, mouth_b, mouth_r, mouth_l)
+    x = resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
+    # if x.shape != (MOUTH_HEIGHT, MOUTH_WIDTH, 3):
+    #     print("math is broken", mouth_t, mouth_b, mouth_r, mouth_l, x.shape, d, frame.shape)
+
+    return x
 
 
 def make_dir(dir):
