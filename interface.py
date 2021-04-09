@@ -54,19 +54,25 @@ class App:
         self.frame_t.grid(row=0, column=0, padx=8, pady=8,
                           columnspan=2, sticky=N + S + E + W)
         
-        self.text_frame_t = Frame(self.frame_t, bg="#c2c3c4")
-        Grid.rowconfigure(self.text_frame_t, 0, weight=1)
-        Grid.rowconfigure(self.text_frame_t, 1, weight=1)
-        Grid.rowconfigure(self.text_frame_t, 2, weight=1)
+        # self.text_frame_t = Frame(self.frame_t, bg="#c2c3c4")
 
-        Grid.columnconfigure(self.text_frame_t, 0, weight=1)
-        Grid.columnconfigure(self.text_frame_t, 1, weight=1)
-        Grid.columnconfigure(self.text_frame_t, 2, weight=1)
-        self.text_frame_t.pack(pady=80)
+        # self.text_frame_t.pack(pady=80)
 
+        
+        Grid.rowconfigure(self.frame_t, 0, weight=1)
+        Grid.rowconfigure(self.frame_t, 1, weight=1)
+        Grid.rowconfigure(self.frame_t, 2, weight=1)
 
+        Grid.columnconfigure(self.frame_t, 0, weight=1)
+        Grid.columnconfigure(self.frame_t, 1, weight=1)
+        Grid.columnconfigure(self.frame_t, 2, weight=1)
         self.frame_t.pack_propagate(False)
-        self.text_frame_t.pack_propagate(False)
+
+        # self.inner_frame_t = Frame(self.frame_t, bg="#c2c3c4")
+        # self.inner_frame_t.grid(row=0, column=0, padx=8, pady=8,
+        #                   columnspan=3, rowspan = 4, sticky=N + S + E + W)
+        # self.inner_frame_t.pack_propagate(False)
+
         # Where the output should be
         self.frame_m = Frame(self.frame, bg="white")
         self.frame_m.grid(row=1, column=0, padx=8, pady=8,
@@ -77,19 +83,6 @@ class App:
         self.frame_b_r = Frame(self.frame, bg="#c2c3c4")
         self.frame_b_l.pack_propagate(False)
 
-        self.text_frame_b_l = Frame(self.frame_b_l, bg="#c2c3c4")
-        self.text_frame_b_l.pack_propagate(False)
-        self.text_frame_b_l.pack(pady=80)
-
-
-        Grid.rowconfigure(self.text_frame_b_l, 0, weight=1)
-        Grid.rowconfigure(self.text_frame_b_l, 1, weight=1)
-        Grid.rowconfigure(self.text_frame_b_l, 2, weight=1)
-
-        Grid.columnconfigure(self.text_frame_b_l, 0, weight=1)
-        Grid.columnconfigure(self.text_frame_b_l, 1, weight=1)
-        Grid.columnconfigure(self.text_frame_b_l, 2, weight=1)
-
 
         self.frame_b_l.grid(row=2, column=0, padx=8, pady=8,
                             columnspan=1, sticky=N + S + E + W)
@@ -97,18 +90,24 @@ class App:
                             columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.pack_propagate(False)
 
-        self.text_frame_b_r = Frame(self.frame_b_r, bg="#c2c3c4")
-        self.text_frame_b_r.pack(pady=80)
+        Grid.rowconfigure(self.frame_b_l, 0, weight=1)
+        Grid.rowconfigure(self.frame_b_l, 1, weight=1)
+        Grid.rowconfigure(self.frame_b_l, 2, weight=1)
 
-        self.text_frame_b_r.pack_propagate(False)
+        Grid.columnconfigure(self.frame_b_l, 0, weight=1)
+        Grid.columnconfigure(self.frame_b_l, 1, weight=1)
+        Grid.columnconfigure(self.frame_b_l, 2, weight=1)
 
-        Grid.rowconfigure(self.text_frame_b_r, 0, weight=1)
-        Grid.rowconfigure(self.text_frame_b_r, 1, weight=1)
-        Grid.rowconfigure(self.text_frame_b_r, 2, weight=1)
 
-        Grid.columnconfigure(self.text_frame_b_r, 0, weight=1)
-        Grid.columnconfigure(self.text_frame_b_r, 1, weight=1)
-        Grid.columnconfigure(self.text_frame_b_r, 2, weight=1)
+        Grid.rowconfigure(self.frame_b_r, 0, weight=1)
+        Grid.rowconfigure(self.frame_b_r, 1, weight=1)
+        Grid.rowconfigure(self.frame_b_r, 2, weight=1)
+
+        Grid.columnconfigure(self.frame_b_r, 0, weight=1)
+        Grid.columnconfigure(self.frame_b_r, 1, weight=1)
+        Grid.columnconfigure(self.frame_b_r, 2, weight=1)
+
+
 
         self.frame_m_b = Frame(self.frame_m, bg="white")
         self.frame_m_b.pack(side=TOP)
@@ -116,15 +115,15 @@ class App:
         Grid.columnconfigure(self.frame_m_b, 1, weight=1)
         Grid.columnconfigure(self.frame_m_b, 2, weight=1)
 
-        self.text_t = Label(self.text_frame_t, text="المقطع المدخل", bg="#c2c3c4", font=("Arial", 25))
+        self.text_t = Label(self.frame_t, text="المقطع المدخل", bg="#c2c3c4", font=("Arial", 25))
         self.text_t.grid(row=1, column=1, padx=8, pady=8,
                           columnspan=1, sticky=N + S + E + W)
 
-        self.text_b_l= Label(self.text_frame_b_l, text="الوجه المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
-        self.text_b_l.grid(row=1, column=1, padx=9, pady=8,
+        self.text_b_l= Label(self.frame_b_l, text="الوجه المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
+        self.text_b_l.grid(row=1, column=1, padx=9,
                           columnspan=1, sticky=N + S + E + W)
         
-        self.text_b_r = Label(self.text_frame_b_r, text="مكان الشفة في الوجه \n المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
+        self.text_b_r = Label(self.frame_b_r, text="مكان الشفة في الوجه \n المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
         self.text_b_r.grid(row=1, column=1, padx=2, pady=8,
                           columnspan=1, sticky=N + S + E + W)
 
