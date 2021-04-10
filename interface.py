@@ -38,6 +38,10 @@ class App:
         master.config(bg="white")
         master.minsize(900, 600)
 
+        logo = PhotoImage(file = '.\\logo.png')
+        
+        # Setting icon of master window
+        master.iconphoto(False, logo)
         # Create Frames to organize widgets in the window
         # self.frame_r = Frame(master, width=300, bg="white")
         # self.frame_r.pack(side="right", fill=Y, padx=2, pady=2)
