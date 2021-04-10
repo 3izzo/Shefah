@@ -230,7 +230,7 @@ class App:
         """ Open filedialog to let the user choose the file to process """
         messagebox.showwarning(
             "تنبيه",
-            "عند تسجيل المقطع يشترط التالي:\n1. أن يحتوي المقطع على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
+            "عند اختيار المقطع يشترط التالي:\n1. أن يحتوي المقطع على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
         video_path = fd.askopenfilename()
 
         for child in self.frame_t.winfo_children():
@@ -360,8 +360,8 @@ class App:
 
     def process_video(self):
 
-        self.text_frame_b_l.destroy()
-        self.text_frame_b_r.destroy()
+        # self.text_frame_b_l.destroy()
+        # self.text_frame_b_r.destroy()
 
         self.total_progress_bar_label.grid()
         self.total_progress_bar.grid()
