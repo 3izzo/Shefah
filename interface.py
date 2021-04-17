@@ -115,7 +115,7 @@ class App:
         Grid.columnconfigure(self.frame_m_b, 1, weight=1)
         Grid.columnconfigure(self.frame_m_b, 2, weight=1)
 
-        self.text_t = Label(self.frame_t, text="المقطع المدخل", bg="#c2c3c4", font=("Arial", 25))
+        self.text_t = Label(self.frame_t, text="الفيديو المدخل", bg="#c2c3c4", font=("Arial", 25))
         self.text_t.grid(row=1, column=1, padx=8, pady=8,
                           columnspan=1, sticky=N + S + E + W)
 
@@ -153,7 +153,7 @@ class App:
 
         # Buttons to make actions
         self.btn_select = Button(
-            self.frame_m_b, text="اختر مقطع", command=self.open_filedialog)
+            self.frame_m_b, text="اختر فيديو", command=self.open_filedialog)
         self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=12)
         self.btn_record = Button(
             self.frame_m_b, text="افتح الكاميرا", command=self.open_camera)
@@ -230,7 +230,7 @@ class App:
         """ Open filedialog to let the user choose the file to process """
         messagebox.showwarning(
             "تنبيه",
-            "عند اختيار المقطع يشترط التالي:\n1. أن يحتوي المقطع على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
+            "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
         video_path = fd.askopenfilename()
 
         for child in self.frame_t.winfo_children():
@@ -265,7 +265,7 @@ class App:
         """ Open the user's camera to record a video to process """
         messagebox.showwarning(
             "تنبيه",
-            "عند تسجيل المقطع يشترط التالي:\n1. أن يحتوي المقطع على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
+            "عند تسجيل الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
         for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
@@ -427,7 +427,7 @@ class App:
 
             self.total_progress_bar['value'] = 100
 
-            self.result = Label(self.frame, text="الرقم المتوقع: %s" % predicted_as_number, bg="white", font=("Arial",20))
+            self.result = Label(self.frame, text="الرقم المنطوق: %s" % predicted_as_number, bg="white", font=("Arial",20))
             self.result.grid(row=3000, column=0, padx=8, pady=8,
                           columnspan=2, sticky=N + S + E + W)
 
