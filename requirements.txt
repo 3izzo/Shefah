@@ -1,3 +1,4 @@
+tensorflow
 scikit-image
 sk-video
 dlib
@@ -7,3 +8,4 @@ keras
 fuzzywuzzy
 jiwer
 numba
+imageio-ffmpeg
