@@ -38,7 +38,7 @@ class App:
         master.config(bg="white")
         master.minsize(900, 600)
 
-        logo = PhotoImage(file=".\\logo.png")
+        logo = PhotoImage(file=".\\icons\\logo.png")
 
         # Setting icon of master window
         master.iconphoto(False, logo)
@@ -107,57 +107,59 @@ class App:
         self.frame_m_b = Frame(self.frame_m, bg="white")
         self.frame_m_b.pack(side=TOP)
 
-        self.text_t = Label(self.frame_t, text="الفيديو المدخل", bg="#c2c3c4", font=("Arial", 25))
-        self.text_t.grid(row=1, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        img_video_in = ImageTk.PhotoImage(Image.open(".\\icons\\video_in.png"))
+        self.text_t = Label(self.frame_t, bg="#c2c3c4")
+        self.text_t.image = img_video_in
+        self.text_t.config(image=img_video_in)
+        self.text_t.pack(expand=True, fill=BOTH)
 
-        self.text_b_l = Label(self.frame_b_l, text="الوجه المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
-        self.text_b_l.grid(row=1, column=1, padx=9, columnspan=1, sticky=N + S + E + W)
+        img_face = ImageTk.PhotoImage(Image.open(".\\icons\\face.png"))
+        self.text_b_l = Label(self.frame_b_l, bg="#c2c3c4")
+        self.text_b_l.image = img_face
+        self.text_b_l.config(image=img_face)
+        self.text_b_l.pack(expand=True, fill=BOTH)
 
-        self.text_b_r = Label(
-            self.frame_b_r, text="مكان الشفة في الوجه \n المتعرف عليه", bg="#c2c3c4", font=("Arial", 25)
-        )
-        self.text_b_r.grid(row=1, column=1, padx=2, pady=8, columnspan=1, sticky=N + S + E + W)
-
-        # Welcome message
-        # self.label = Label(
-        #     self.frame_m,
-        #     text="مرحبا بك في شفه" + "\n" + "أختر مقطع أو سجله.",
-        #     justify="center",
-        #     bg="white",
-        # )
-        # self.label.pack()
-
-        # # Shefah's Logo
-        # image = Image.open(".\\logo.png")
-        # image = image.resize((300, 278), Image.ANTIALIAS)
-        # self.img = ImageTk.PhotoImage(image)
-        # Label(self.frame_r, image=self.img, bg="white").pack(side="top", expand=False)
-
-        # Creating two progress bars to inform the user about the progress of the prediction
-        # frame_helper = Frame(self.frame_r, bg="orange")
-        # frame_helper.pack(side="bottom", pady=8)
-
-        # self.masking_frame = Frame(frame_helper, bg="white")
-        # self.masking_frame.lift()
-        # self.masking_frame.grid(row=100, sticky=NSEW, rowspan=4)
+        img_lips = ImageTk.PhotoImage(Image.open(".\\icons\\lips.png"))
+        self.text_b_r = Label(self.frame_b_r, bg="#c2c3c4")
+        self.text_b_r.image = img_lips
+        self.text_b_r.config(image=img_lips)
+        self.text_b_r.pack(expand=True, fill=BOTH)
 
         # Buttons to make actions
-        self.btn_select = Button(self.frame_m_b, text="اختر فيديو", command=self.open_filedialog, width=8, height=1)
+        img_select = ImageTk.PhotoImage(Image.open(".\\icons\\select.png"))
+        self.btn_select = Button(
+            self.frame_m_b, text="اختر فيديو ", command=self.open_filedialog, compound=RIGHT, width=120
+        )
+        self.btn_select.image = img_select
+        self.btn_select.config(image=img_select)
         self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=4, pady=2)
-        self.btn_select.grid_remove()
-        self.btn_record = Button(self.frame_m_b, text="افتح الكاميرا", command=self.open_camera, width=8, height=1)
+
+        img_camera = ImageTk.PhotoImage(Image.open(".\\icons\\camera.png"))
+        self.btn_record = Button(
+            self.frame_m_b, text="افتح الكاميرا ", command=self.open_camera, compound=RIGHT, width=120
+        )
+        self.btn_record.image = img_camera
+        self.btn_record.config(image=img_camera)
+
         self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=4, pady=2)
-        self.btn_record.grid_remove()
 
         self.btn_record["font"] = self.btn_select["font"] = self.text_size
 
-        self.btn_select.grid()
-        self.btn_record.grid()
-
-        self.btn_record_start = Button(self.frame_m_b, text="سجل", command=self.toggle_recording, width=8, height=1)
+        img_record = ImageTk.PhotoImage(Image.open(".\\icons\\record.png"))
+        self.btn_record_start = Button(
+            self.frame_m_b, text="سجل ", command=self.toggle_recording, compound=RIGHT, width=120
+        )
+        self.btn_record_start.image = img_record
+        self.btn_record_start.config(image=img_record)
         self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=4, pady=2)
         self.btn_record_start.grid_remove()
-        self.btn_record_end = Button(self.frame_m_b, text="توقف", command=self.toggle_recording, width=8, height=1)
+
+        img_stop = ImageTk.PhotoImage(Image.open(".\\icons\\stop.png"))
+        self.btn_record_end = Button(
+            self.frame_m_b, text="توقف ", command=self.toggle_recording, compound=RIGHT, width=120
+        )
+        self.btn_record_end.image = img_stop
+        self.btn_record_end.config(image=img_stop)
         self.btn_record_end.grid(column=2, row=0, sticky=NSEW, padx=4, pady=2)
         self.btn_record_end.grid_remove()
 
@@ -301,6 +303,7 @@ class App:
             self.btn_select["state"] = NORMAL
             self.btn_record.grid()
             self.btn_record_end.grid_remove()
+            self.btn_record_start.grid_remove()
             self.cap.release()
 
             for child in self.frame_t.winfo_children():
