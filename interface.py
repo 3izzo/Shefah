@@ -38,8 +38,8 @@ class App:
         master.config(bg="white")
         master.minsize(900, 600)
 
-        logo = PhotoImage(file = '.\\logo.png')
-        
+        logo = PhotoImage(file=".\\logo.png")
+
         # Setting icon of master window
         master.iconphoto(False, logo)
         # Create Frames to organize widgets in the window
@@ -55,14 +55,12 @@ class App:
         Grid.rowconfigure(self.frame, 2, weight=1)
 
         self.frame_t = Frame(self.frame, bg="#c2c3c4")
-        self.frame_t.grid(row=0, column=0, padx=8, pady=8,
-                          columnspan=2, sticky=N + S + E + W)
-        
+        self.frame_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+
         # self.text_frame_t = Frame(self.frame_t, bg="#c2c3c4")
 
         # self.text_frame_t.pack(pady=80)
 
-        
         Grid.rowconfigure(self.frame_t, 0, weight=1)
         Grid.rowconfigure(self.frame_t, 1, weight=1)
         Grid.rowconfigure(self.frame_t, 2, weight=1)
@@ -79,19 +77,15 @@ class App:
 
         # Where the output should be
         self.frame_m = Frame(self.frame, bg="white")
-        self.frame_m.grid(row=1, column=0, padx=8, pady=8,
-                          columnspan=2, sticky=N + S + E + W)
+        self.frame_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
         self.frame_b_l = Frame(self.frame, bg="#c2c3c4")
         self.frame_b_r = Frame(self.frame, bg="#c2c3c4")
         self.frame_b_l.pack_propagate(False)
 
-
-        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8,
-                            columnspan=1, sticky=N + S + E + W)
-        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8,
-                            columnspan=1, sticky=N + S + E + W)
+        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.pack_propagate(False)
 
         Grid.rowconfigure(self.frame_b_l, 0, weight=1)
@@ -102,7 +96,6 @@ class App:
         Grid.columnconfigure(self.frame_b_l, 1, weight=1)
         Grid.columnconfigure(self.frame_b_l, 2, weight=1)
 
-
         Grid.rowconfigure(self.frame_b_r, 0, weight=1)
         Grid.rowconfigure(self.frame_b_r, 1, weight=1)
         Grid.rowconfigure(self.frame_b_r, 2, weight=1)
@@ -111,26 +104,19 @@ class App:
         Grid.columnconfigure(self.frame_b_r, 1, weight=1)
         Grid.columnconfigure(self.frame_b_r, 2, weight=1)
 
-
-
         self.frame_m_b = Frame(self.frame_m, bg="white")
         self.frame_m_b.pack(side=TOP)
-        Grid.columnconfigure(self.frame_m_b, 0, weight=1)
-        Grid.columnconfigure(self.frame_m_b, 1, weight=1)
-        Grid.columnconfigure(self.frame_m_b, 2, weight=1)
 
         self.text_t = Label(self.frame_t, text="الفيديو المدخل", bg="#c2c3c4", font=("Arial", 25))
-        self.text_t.grid(row=1, column=1, padx=8, pady=8,
-                          columnspan=1, sticky=N + S + E + W)
+        self.text_t.grid(row=1, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
 
-        self.text_b_l= Label(self.frame_b_l, text="الوجه المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
-        self.text_b_l.grid(row=1, column=1, padx=9,
-                          columnspan=1, sticky=N + S + E + W)
-        
-        self.text_b_r = Label(self.frame_b_r, text="مكان الشفة في الوجه \n المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
-        self.text_b_r.grid(row=1, column=1, padx=2, pady=8,
-                          columnspan=1, sticky=N + S + E + W)
+        self.text_b_l = Label(self.frame_b_l, text="الوجه المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
+        self.text_b_l.grid(row=1, column=1, padx=9, columnspan=1, sticky=N + S + E + W)
 
+        self.text_b_r = Label(
+            self.frame_b_r, text="مكان الشفة في الوجه \n المتعرف عليه", bg="#c2c3c4", font=("Arial", 25)
+        )
+        self.text_b_r.grid(row=1, column=1, padx=2, pady=8, columnspan=1, sticky=N + S + E + W)
 
         # Welcome message
         # self.label = Label(
@@ -156,46 +142,39 @@ class App:
         # self.masking_frame.grid(row=100, sticky=NSEW, rowspan=4)
 
         # Buttons to make actions
-        self.btn_select = Button(
-            self.frame_m_b, text="اختر فيديو", command=self.open_filedialog, width=8)
-        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=4)
-        self.btn_record = Button(
-            self.frame_m_b, text="افتح الكاميرا", command=self.open_camera, width=8)
-        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=4)
+        self.btn_select = Button(self.frame_m_b, text="اختر فيديو", command=self.open_filedialog, width=8, height=1)
+        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=4, pady=2)
+        self.btn_select.grid_remove()
+        self.btn_record = Button(self.frame_m_b, text="افتح الكاميرا", command=self.open_camera, width=8, height=1)
+        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=4, pady=2)
+        self.btn_record.grid_remove()
 
-        self.btn_record['font'] = self.btn_select['font'] = self.text_size
+        self.btn_record["font"] = self.btn_select["font"] = self.text_size
 
-        self.btn_record_start = Button(
-            self.frame_m_b, text="سجل", command=self.toggle_recording, width=8)
-        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=4)
+        self.btn_select.grid()
+        self.btn_record.grid()
+
+        self.btn_record_start = Button(self.frame_m_b, text="سجل", command=self.toggle_recording, width=8, height=1)
+        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=4, pady=2)
         self.btn_record_start.grid_remove()
-        self.btn_record_end = Button(
-            self.frame_m_b, text="توقف", command=self.toggle_recording, width=8)
-        self.btn_record_end.grid(column=2, row=0, sticky=NSEW, padx=4)
+        self.btn_record_end = Button(self.frame_m_b, text="توقف", command=self.toggle_recording, width=8, height=1)
+        self.btn_record_end.grid(column=2, row=0, sticky=NSEW, padx=4, pady=2)
         self.btn_record_end.grid_remove()
 
-        self.btn_record_start['font'] = self.btn_record_end['font'] = self.text_size
+        self.btn_record_start["font"] = self.btn_record_end["font"] = self.text_size
 
         # progress bars
-        self.partial_progress_bar_label = Label(
-            self.frame, text="", bg="white")
-        self.partial_progress_bar_label.grid(
-            row=100, columnspan=2, padx=4, sticky=E)
-        self.partial_progress_bar = ttk.Progressbar(
-            self.frame, orient=HORIZONTAL, mode="determinate")
-        self.partial_progress_bar.grid(
-            row=101, columnspan=2, padx=8, sticky=W + E)
+        self.partial_progress_bar_label = Label(self.frame, text="", bg="white")
+        self.partial_progress_bar_label.grid(row=100, columnspan=2, padx=4, sticky=E)
+        self.partial_progress_bar = ttk.Progressbar(self.frame, orient=HORIZONTAL, mode="determinate")
+        self.partial_progress_bar.grid(row=101, columnspan=2, padx=8, sticky=W + E)
 
-        self.total_progress_bar_label = Label(
-            self.frame, text="نسبة الإنجاز", bg="white")
-        self.total_progress_bar_label.grid(
-            row=102, columnspan=2, padx=4, sticky=E)
-        self.total_progress_bar = ttk.Progressbar(
-            self.frame, orient=HORIZONTAL, mode="determinate")
-        self.total_progress_bar.grid(
-            row=103, columnspan=2, padx=8, pady=4, sticky=W + E)
+        self.total_progress_bar_label = Label(self.frame, text="نسبة الإنجاز", bg="white")
+        self.total_progress_bar_label.grid(row=102, columnspan=2, padx=4, sticky=E)
+        self.total_progress_bar = ttk.Progressbar(self.frame, orient=HORIZONTAL, mode="determinate")
+        self.total_progress_bar.grid(row=103, columnspan=2, padx=8, pady=4, sticky=W + E)
 
-        self.total_progress_bar_label['font'] = self.partial_progress_bar_label['font'] = self.text_size
+        self.total_progress_bar_label["font"] = self.partial_progress_bar_label["font"] = self.text_size
 
         self.total_progress_bar_label.grid_remove()
         self.total_progress_bar.grid_remove()
@@ -241,7 +220,8 @@ class App:
         """ Open filedialog to let the user choose the file to process """
         messagebox.showwarning(
             "تنبيه",
-            "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
+            "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",
+        )
         video_path = fd.askopenfilename()
 
         for child in self.frame_t.winfo_children():
@@ -258,15 +238,12 @@ class App:
             child.destroy()
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
-        
 
-        self.input_video = [
-            i for i in imageio.get_reader(video_path).iter_data()]
+        self.input_video = [i for i in imageio.get_reader(video_path).iter_data()]
         if self.input_video:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(target=self.stream, args=(
-                self.input_video, vid_label, self.frame_t))
+            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
             self.input_thread.daemon = 1
             self.input_thread.start()
             self.process_video()
@@ -276,7 +253,8 @@ class App:
         """ Open the user's camera to record a video to process """
         messagebox.showwarning(
             "تنبيه",
-            "عند تسجيل الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
+            "عند تسجيل الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",
+        )
         for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
@@ -297,8 +275,7 @@ class App:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
             self.input_thread = Displaythread(
-                target=self.stream_camera_and_capture, args=(
-                    self.cap, vid_label, self.frame_t)
+                target=self.stream_camera_and_capture, args=(self.cap, vid_label, self.frame_t)
             )
             self.input_thread.daemon = 1
             self.input_thread.start()
@@ -333,10 +310,7 @@ class App:
             if self.input_video:
                 vid_label = Label(self.frame_t, bg="black")
                 vid_label.pack(expand=True, fill=BOTH)
-                self.input_thread = Displaythread(
-                    target=self.stream, args=(
-                        self.input_video, vid_label, self.frame_t)
-                )
+                self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
                 self.input_thread.daemon = 1
                 self.input_thread.start()
                 # self.btn_prcs["state"] = "normal"
@@ -383,16 +357,14 @@ class App:
         self.face_video = []
         vid_label = Label(self.frame_b_l, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.face_thread = Displaythread(target=self.stream, args=(
-            self.face_video, vid_label, self.frame_t))
+        self.face_thread = Displaythread(target=self.stream, args=(self.face_video, vid_label, self.frame_t))
         self.face_thread.daemon = 1
         self.face_thread.start()
 
         self.ROI_video = []
         vid_label = Label(self.frame_b_r, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.ROI_thread = Displaythread(target=self.stream, args=(
-            self.ROI_video, vid_label, self.frame_t))
+        self.ROI_thread = Displaythread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_t))
         self.ROI_thread.daemon = 1
         self.ROI_thread.start()
 
@@ -400,14 +372,13 @@ class App:
             time.sleep(0.5)
             i = 0
             video_for_prediction = []
-            self.partial_progress_bar_label['text'] = "معالجة"
-            self.partial_progress_bar['value'] = 10
+            self.partial_progress_bar_label["text"] = "معالجة"
+            self.partial_progress_bar["value"] = 10
             for frame in self.input_video:
                 frame = frame[:, :, :3]
-                cropped_frame = get_frames_mouth(
-                    face_detector, predictor, frame, interface=self)
+                cropped_frame = get_frames_mouth(face_detector, predictor, frame, interface=self)
 
-                self.partial_progress_bar['value'] += i
+                self.partial_progress_bar["value"] += i
 
                 cropped_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2RGB)
                 # cv2.imwrite(".\\G\\frame%d.png" % i, cropped_frame)
@@ -417,31 +388,30 @@ class App:
             while i < max_frame_count:
                 video_for_prediction.append(np.zeros((frame_h, frame_w, 3)))
                 i += 1
-            self.partial_progress_bar['value'] = 100
-            self.total_progress_bar['value'] = 25
-            self.partial_progress_bar_label['text'] = "تحميل النموذج"
-            self.partial_progress_bar['value'] = 10
-            video_for_prediction = np.array(
-                [video_for_prediction]).astype(np.float32) / 255
-            self.partial_progress_bar['value'] = 50
+            self.partial_progress_bar["value"] = 100
+            self.total_progress_bar["value"] = 25
+            self.partial_progress_bar_label["text"] = "تحميل النموذج"
+            self.partial_progress_bar["value"] = 10
+            video_for_prediction = np.array([video_for_prediction]).astype(np.float32) / 255
+            self.partial_progress_bar["value"] = 50
             # shefah_model = load_model()
-            self.partial_progress_bar['value'] = 100
+            self.partial_progress_bar["value"] = 100
 
-            self.total_progress_bar['value'] = 75
+            self.total_progress_bar["value"] = 75
 
-            self.partial_progress_bar_label['text'] = "يتوقع"
-            self.partial_progress_bar['value'] = 30
-            (predicted, predicted_as_number) = predict_lip(
-                video_for_prediction, self.shefah_model)
-            self.partial_progress_bar['value'] = 100
+            self.partial_progress_bar_label["text"] = "يتوقع"
+            self.partial_progress_bar["value"] = 30
+            (predicted, predicted_as_number) = predict_lip(video_for_prediction, self.shefah_model)
+            self.partial_progress_bar["value"] = 100
 
-            self.partial_progress_bar_label['text'] = "انتهى"
+            self.partial_progress_bar_label["text"] = "انتهى"
 
-            self.total_progress_bar['value'] = 100
+            self.total_progress_bar["value"] = 100
 
-            self.result = Label(self.frame, text="الرقم المنطوق: %s" % predicted_as_number, bg="white", font=("Arial",20))
-            self.result.grid(row=3000, column=0, padx=8, pady=8,
-                          columnspan=2, sticky=N + S + E + W)
+            self.result = Label(
+                self.frame, text="الرقم المنطوق: %s" % predicted_as_number, bg="white", font=("Arial", 20)
+            )
+            self.result.grid(row=3000, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
 
         if self.processing_thread != None:
             self.processing_thread.raise_exception()
