@@ -218,6 +218,8 @@ class App:
             for image in video:
                 frame = Image.fromarray(image)
                 h = vid_label.winfo_height()
+                if h < 20:
+                    h = 20
                 w = int(h * (frame.width / frame.height))
                 parent_width = vid_label.winfo_width()
                 if w > parent_width:
