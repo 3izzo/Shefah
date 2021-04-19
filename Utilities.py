@@ -100,10 +100,11 @@ def randomly_duplicate_first_frame(frames):
     if len(frames) >= max_frame_count:
         return frames
     # frames = frames.tolist()
-    time_to_duplicate = np.random.randint(1, max_frame_count - len(frames))
-    x = np.array([frames[0]] * time_to_duplicate)
+    # time_to_duplicate = np.random.randint(1, max_frame_count - len(frames))
+    time_to_duplicate = 0
+    # x = np.array([frames[0]] * time_to_duplicate)
     y = np.array([zeros_frame] * (max_frame_count - time_to_duplicate - len(frames)))
-    frames = np.concatenate([x, frames, y])
+    frames = np.concatenate([frames, y])
 
     return frames
 
