@@ -54,19 +54,39 @@ class App:
         Grid.rowconfigure(self.frame, 0, weight=1)
         Grid.rowconfigure(self.frame, 2, weight=1)
 
-        self.frame_t = Frame(self.frame, bg="grey")
+        self.frame_t = Frame(self.frame, bg="#c2c3c4")
         self.frame_t.grid(row=0, column=0, padx=8, pady=8,
                           columnspan=2, sticky=N + S + E + W)
+        
+        # self.text_frame_t = Frame(self.frame_t, bg="#c2c3c4")
+
+        # self.text_frame_t.pack(pady=80)
+
+        
+        Grid.rowconfigure(self.frame_t, 0, weight=1)
+        Grid.rowconfigure(self.frame_t, 1, weight=1)
+        Grid.rowconfigure(self.frame_t, 2, weight=1)
+
+        Grid.columnconfigure(self.frame_t, 0, weight=1)
+        Grid.columnconfigure(self.frame_t, 1, weight=1)
+        Grid.columnconfigure(self.frame_t, 2, weight=1)
         self.frame_t.pack_propagate(False)
+
+        # self.inner_frame_t = Frame(self.frame_t, bg="#c2c3c4")
+        # self.inner_frame_t.grid(row=0, column=0, padx=8, pady=8,
+        #                   columnspan=3, rowspan = 4, sticky=N + S + E + W)
+        # self.inner_frame_t.pack_propagate(False)
+
         # Where the output should be
         self.frame_m = Frame(self.frame, bg="white")
         self.frame_m.grid(row=1, column=0, padx=8, pady=8,
                           columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
-        self.frame_b_l = Frame(self.frame, bg="grey")
-        self.frame_b_r = Frame(self.frame, bg="grey")
+        self.frame_b_l = Frame(self.frame, bg="#c2c3c4")
+        self.frame_b_r = Frame(self.frame, bg="#c2c3c4")
         self.frame_b_l.pack_propagate(False)
+
 
         self.frame_b_l.grid(row=2, column=0, padx=8, pady=8,
                             columnspan=1, sticky=N + S + E + W)
@@ -74,11 +94,43 @@ class App:
                             columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.pack_propagate(False)
 
+        Grid.rowconfigure(self.frame_b_l, 0, weight=1)
+        Grid.rowconfigure(self.frame_b_l, 1, weight=1)
+        Grid.rowconfigure(self.frame_b_l, 2, weight=1)
+
+        Grid.columnconfigure(self.frame_b_l, 0, weight=1)
+        Grid.columnconfigure(self.frame_b_l, 1, weight=1)
+        Grid.columnconfigure(self.frame_b_l, 2, weight=1)
+
+
+        Grid.rowconfigure(self.frame_b_r, 0, weight=1)
+        Grid.rowconfigure(self.frame_b_r, 1, weight=1)
+        Grid.rowconfigure(self.frame_b_r, 2, weight=1)
+
+        Grid.columnconfigure(self.frame_b_r, 0, weight=1)
+        Grid.columnconfigure(self.frame_b_r, 1, weight=1)
+        Grid.columnconfigure(self.frame_b_r, 2, weight=1)
+
+
+
         self.frame_m_b = Frame(self.frame_m, bg="white")
         self.frame_m_b.pack(side=TOP)
         Grid.columnconfigure(self.frame_m_b, 0, weight=1)
         Grid.columnconfigure(self.frame_m_b, 1, weight=1)
         Grid.columnconfigure(self.frame_m_b, 2, weight=1)
+
+        self.text_t = Label(self.frame_t, text="الفيديو المدخل", bg="#c2c3c4", font=("Arial", 25))
+        self.text_t.grid(row=1, column=1, padx=8, pady=8,
+                          columnspan=1, sticky=N + S + E + W)
+
+        self.text_b_l= Label(self.frame_b_l, text="الوجه المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
+        self.text_b_l.grid(row=1, column=1, padx=9,
+                          columnspan=1, sticky=N + S + E + W)
+        
+        self.text_b_r = Label(self.frame_b_r, text="مكان الشفة في الوجه \n المتعرف عليه", bg="#c2c3c4", font=("Arial", 25))
+        self.text_b_r.grid(row=1, column=1, padx=2, pady=8,
+                          columnspan=1, sticky=N + S + E + W)
+
 
         # Welcome message
         # self.label = Label(
@@ -105,7 +157,7 @@ class App:
 
         # Buttons to make actions
         self.btn_select = Button(
-            self.frame_m_b, text="اختر مقطع", command=self.open_filedialog)
+            self.frame_m_b, text="اختر فيديو", command=self.open_filedialog)
         self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=12)
         self.btn_record = Button(
             self.frame_m_b, text="افتح الكاميرا", command=self.open_camera)
@@ -187,7 +239,7 @@ class App:
         """ Open filedialog to let the user choose the file to process """
         messagebox.showwarning(
             "تنبيه",
-            "عند تسجيل المقطع يشترط التالي:\n1. أن يحتوي المقطع على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
+            "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
         video_path = fd.askopenfilename()
 
         for child in self.frame_t.winfo_children():
@@ -204,6 +256,7 @@ class App:
             child.destroy()
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
+        
 
         self.input_video = [
             i for i in imageio.get_reader(video_path).iter_data()]
@@ -220,7 +273,8 @@ class App:
     def open_camera(self):
         """ Open the user's camera to record a video to process """
         messagebox.showwarning(
-            "تنبيه", "عند تسجيل المقطع يجب ان يكون هناك شخص واحد فقط وجهه واضح وشفتيه ايضا. ينطق رقم واحد بين 0-9 بشكل واضح. ولا تتعدا مدة المقطع عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين",)
+            "تنبيه",
+            "عند تسجيل الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",)
         for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
@@ -314,7 +368,10 @@ class App:
                 event.wait(waiting_time)
 
     def process_video(self):
-        # self.btn_prcs["state"] = DISABLED
+
+        # self.text_frame_b_l.destroy()
+        # self.text_frame_b_r.destroy()
+
         self.total_progress_bar_label.grid()
         self.total_progress_bar.grid()
         self.partial_progress_bar_label.grid()
@@ -379,8 +436,9 @@ class App:
 
             self.total_progress_bar['value'] = 100
 
-            messagebox.showinfo(
-                "الرقم المتوقع", "الرقم المنطوق هو: %s" % predicted_as_number)
+            self.result = Label(self.frame, text="الرقم المنطوق: %s" % predicted_as_number, bg="white", font=("Arial",20))
+            self.result.grid(row=3000, column=0, padx=8, pady=8,
+                          columnspan=2, sticky=N + S + E + W)
 
         if self.processing_thread != None:
             self.processing_thread.raise_exception()
