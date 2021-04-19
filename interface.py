@@ -157,17 +157,17 @@ class App:
 
         # Buttons to make actions
         self.btn_select = Button(
-            self.frame_m_b, text="اختر فيديو", command=self.open_filedialog)
-        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=12)
+            self.frame_m_b, text="اختر فيديو", command=self.open_filedialog, width=8)
+        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=4)
         self.btn_record = Button(
-            self.frame_m_b, text="افتح الكاميرا", command=self.open_camera)
+            self.frame_m_b, text="افتح الكاميرا", command=self.open_camera, width=8)
         self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=4)
 
         self.btn_record['font'] = self.btn_select['font'] = self.text_size
 
         self.btn_record_start = Button(
             self.frame_m_b, text="سجل", command=self.toggle_recording, width=8)
-        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=12)
+        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=4)
         self.btn_record_start.grid_remove()
         self.btn_record_end = Button(
             self.frame_m_b, text="توقف", command=self.toggle_recording, width=8)
@@ -340,6 +340,7 @@ class App:
                 self.input_thread.daemon = 1
                 self.input_thread.start()
                 # self.btn_prcs["state"] = "normal"
+                self.process_video()
 
     def stream_camera_and_capture(self, capture, vid_label, parent):
         """ takes a video and play the video """
