@@ -54,7 +54,8 @@ class App:
         Grid.rowconfigure(self.frame, 2, weight=1)
 
         self.frame_t = ttk.Frame(self.frame)
-        self.frame_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_t.grid(row=0, column=0, padx=8, pady=8,
+                          columnspan=2, sticky=N + S + E + W)
 
         # self.text_frame_t = ttk.Frame(self.frame_t, bg="#c2c3c4")
 
@@ -64,15 +65,18 @@ class App:
 
         # Where the output should be
         self.frame_m = ttk.Frame(self.frame)
-        self.frame_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+        self.frame_m.grid(row=1, column=0, padx=8, pady=8,
+                          columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
         self.frame_b_l = ttk.Frame(self.frame)
         self.frame_b_r = ttk.Frame(self.frame)
         self.frame_b_l.pack_propagate(False)
 
-        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
-        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
+        self.frame_b_l.grid(row=2, column=0, padx=8, pady=8,
+                            columnspan=1, sticky=N + S + E + W)
+        self.frame_b_r.grid(row=2, column=1, padx=8, pady=8,
+                            columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.pack_propagate(False)
 
         self.frame_m_b = ttk.Frame(self.frame_m)
@@ -135,7 +139,8 @@ class App:
         )
         self.btn_record_start.image = img_record
         self.btn_record_start.config(image=img_record)
-        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=8, pady=2)
+        self.btn_record_start.grid(
+            column=1, row=0, sticky=NSEW, padx=8, pady=2)
         self.btn_record_start.grid_remove()
 
         img_stop = ImageTk.PhotoImage(Image.open(".\\icons\\stop.png"))
@@ -153,23 +158,39 @@ class App:
         self.btn_record_end.grid_remove()
 
         # progress bars
-        self.partial_progress_bar_label = Label(self.frame, text="", bg="white")
-        self.partial_progress_bar_label.grid(row=100, columnspan=2, padx=4, sticky=E)
-        self.partial_progress_bar = ttk.Progressbar(self.frame, orient=HORIZONTAL, mode="determinate")
-        self.partial_progress_bar.grid(row=101, columnspan=2, padx=8, sticky=W + E)
+        self.partial_progress_bar_label = Label(
+            self.frame, text="", bg="white")
+        self.partial_progress_bar_label.grid(
+            row=100, columnspan=2, padx=4, sticky=E)
+        self.partial_progress_bar = ttk.Progressbar(
+            self.frame, orient=HORIZONTAL, mode="determinate")
+        self.partial_progress_bar.grid(
+            row=101, columnspan=2, padx=8, sticky=W + E)
 
-        self.total_progress_bar_label = Label(self.frame, text="نسبة الإنجاز", bg="white")
-        self.total_progress_bar_label.grid(row=102, columnspan=2, padx=4, sticky=E)
-        self.total_progress_bar = ttk.Progressbar(self.frame, orient=HORIZONTAL, mode="determinate")
-        self.total_progress_bar.grid(row=103, columnspan=2, padx=8, pady=4, sticky=W + E)
+        self.total_progress_bar_label = Label(
+            self.frame, text="نسبة الإنجاز", bg="white")
+        self.total_progress_bar_label.grid(
+            row=102, columnspan=2, padx=4, sticky=E)
+        self.total_progress_bar = ttk.Progressbar(
+            self.frame, orient=HORIZONTAL, mode="determinate")
+        self.total_progress_bar.grid(
+            row=103, columnspan=2, padx=8, pady=4, sticky=W + E)
 
-        self.total_progress_bar_label["font"] = self.partial_progress_bar_label["font"] = ("Times New Roman", 14)
+        self.total_progress_bar_label["font"] = self.partial_progress_bar_label["font"] = (
+            "Times New Roman", 14)
 
         self.total_progress_bar_label.grid_remove()
         self.total_progress_bar.grid_remove()
         self.partial_progress_bar_label.grid_remove()
         self.partial_progress_bar.grid_remove()
 
+        # result
+        self.result = Label(
+            self.frame, text="الرقم المنطوق:", bg="white", font=("Arial", 20)
+        )
+        self.result.grid(row=3000, column=0, padx=8, pady=8,
+                         columnspan=2, sticky=N + S + E + W)
+        self.result.grid_remove()
         # self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
         # self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
         # self.btn_exit = Button(frame_helper, text="خروج", command=quit)
@@ -230,11 +251,13 @@ class App:
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
 
-        self.input_video = [i for i in imageio.get_reader(video_path).iter_data()]
+        self.input_video = [
+            i for i in imageio.get_reader(video_path).iter_data()]
         if self.input_video:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
+            self.input_thread = Displaythread(target=self.stream, args=(
+                self.input_video, vid_label, self.frame_t))
             self.input_thread.daemon = 1
             self.input_thread.start()
             self.process_video()
@@ -276,7 +299,8 @@ class App:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
             self.input_thread = Displaythread(
-                target=self.stream_camera_and_capture, args=(self.cap, vid_label, self.frame_t)
+                target=self.stream_camera_and_capture, args=(
+                    self.cap, vid_label, self.frame_t)
             )
             self.input_thread.daemon = 1
             self.input_thread.start()
@@ -311,7 +335,8 @@ class App:
             if self.input_video:
                 vid_label = Label(self.frame_t, bg="black")
                 vid_label.pack(expand=True, fill=BOTH)
-                self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
+                self.input_thread = Displaythread(target=self.stream, args=(
+                    self.input_video, vid_label, self.frame_t))
                 self.input_thread.daemon = 1
                 self.input_thread.start()
                 # self.btn_prcs["state"] = "normal"
@@ -367,14 +392,16 @@ class App:
         self.face_video = []
         vid_label = Label(self.frame_b_l, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.face_thread = Displaythread(target=self.stream, args=(self.face_video, vid_label, self.frame_t))
+        self.face_thread = Displaythread(target=self.stream, args=(
+            self.face_video, vid_label, self.frame_t))
         self.face_thread.daemon = 1
         self.face_thread.start()
 
         self.ROI_video = []
         vid_label = Label(self.frame_b_r, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.ROI_thread = Displaythread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_t))
+        self.ROI_thread = Displaythread(target=self.stream, args=(
+            self.ROI_video, vid_label, self.frame_t))
         self.ROI_thread.daemon = 1
         self.ROI_thread.start()
 
@@ -382,11 +409,14 @@ class App:
             time.sleep(0.5)
             i = 0
             video_for_prediction = []
+            self.result.grid_remove()
             self.partial_progress_bar_label["text"] = "معالجة"
             self.partial_progress_bar["value"] = 10
+            self.total_progress_bar["value"] = 0
             for frame in self.input_video:
                 frame = frame[:, :, :3]
-                cropped_frame = get_frames_mouth(face_detector, predictor, frame, interface=self)
+                cropped_frame = get_frames_mouth(
+                    face_detector, predictor, frame, interface=self)
 
                 self.partial_progress_bar["value"] += i
 
@@ -402,7 +432,8 @@ class App:
             self.total_progress_bar["value"] = 25
             self.partial_progress_bar_label["text"] = "تحميل النموذج"
             self.partial_progress_bar["value"] = 10
-            video_for_prediction = np.array([video_for_prediction]).astype(np.float32) / 255
+            video_for_prediction = np.array(
+                [video_for_prediction]).astype(np.float32) / 255
             self.partial_progress_bar["value"] = 50
             # shefah_model = load_model()
             self.partial_progress_bar["value"] = 100
@@ -411,17 +442,15 @@ class App:
 
             self.partial_progress_bar_label["text"] = "يتوقع"
             self.partial_progress_bar["value"] = 30
-            (predicted, predicted_as_number) = predict_lip(video_for_prediction, self.shefah_model)
+            (predicted, predicted_as_number) = predict_lip(
+                video_for_prediction, self.shefah_model)
             self.partial_progress_bar["value"] = 100
 
             self.partial_progress_bar_label["text"] = "انتهى"
 
             self.total_progress_bar["value"] = 100
-
-            self.result = Label(
-                self.frame, text="الرقم المنطوق: %s" % predicted_as_number, bg="white", font=("Arial", 20)
-            )
-            self.result.grid(row=3000, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
+            self.result.grid()
+            self.result["text"] = "الرقم المنطوق: %s" % predicted_as_number
 
         if self.processing_thread != None:
             self.processing_thread.raise_exception()
