@@ -113,16 +113,16 @@ class App:
         self.text_t.config(image=img_video_in)
         self.text_t.pack(expand=True, fill=BOTH)
 
-        img_face = ImageTk.PhotoImage(Image.open(".\\icons\\face.png"))
+        self.img_face = ImageTk.PhotoImage(Image.open(".\\icons\\face.png"))
         self.text_b_l = Label(self.frame_b_l, bg="#c2c3c4")
-        self.text_b_l.image = img_face
-        self.text_b_l.config(image=img_face)
+        self.text_b_l.image = self.img_face
+        self.text_b_l.config(image=self.img_face)
         self.text_b_l.pack(expand=True, fill=BOTH)
 
-        img_lips = ImageTk.PhotoImage(Image.open(".\\icons\\lips.png"))
+        self.img_lips = ImageTk.PhotoImage(Image.open(".\\icons\\lips.png"))
         self.text_b_r = Label(self.frame_b_r, bg="#c2c3c4")
-        self.text_b_r.image = img_lips
-        self.text_b_r.config(image=img_lips)
+        self.text_b_r.image = self.img_lips
+        self.text_b_r.config(image=self.img_lips)
         self.text_b_r.pack(expand=True, fill=BOTH)
 
         # Buttons to make actions
@@ -272,6 +272,16 @@ class App:
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
 
+        self.text_b_l = Label(self.frame_b_l, bg="#c2c3c4")
+        self.text_b_l.image = self.img_face
+        self.text_b_l.config(image=self.img_face)
+        self.text_b_l.pack(expand=True, fill=BOTH)
+
+        self.text_b_r = Label(self.frame_b_r, bg="#c2c3c4")
+        self.text_b_r.image = self.img_lips
+        self.text_b_r.config(image=self.img_lips)
+        self.text_b_r.pack(expand=True, fill=BOTH)
+
         self.cap = cv2.VideoCapture(0)
         if self.cap:
             vid_label = Label(self.frame_t, bg="black")
@@ -286,8 +296,7 @@ class App:
         # self.btn_prcs["state"] = DISABLED
         self.btn_record.grid_remove()
         self.btn_record_start.grid()
-        self.btn_record_end.grid()
-        self.btn_record_end["state"] = DISABLED
+        self.btn_record_start["state"] = NORMAL
 
     def toggle_recording(self):
 
@@ -296,8 +305,8 @@ class App:
         if self.recording:
             self.btn_select["state"] = DISABLED
             self.input_video = []
-            self.btn_record_start["state"] = DISABLED
-            self.btn_record_end["state"] = NORMAL
+            self.btn_record_start.grid_remove()
+            self.btn_record_end.grid()
 
         else:
             self.btn_select["state"] = NORMAL
@@ -351,7 +360,17 @@ class App:
 
         # self.text_frame_b_l.destroy()
         # self.text_frame_b_r.destroy()
+        for child in self.frame_b_l.winfo_children():   
+            child.destroy()
+        if self.face_thread != None:
+            self.face_thread.raise_exception()
 
+        for child in self.frame_b_r.winfo_children():
+            child.destroy()
+        if self.ROI_thread != None:
+            self.ROI_thread.raise_exception()
+
+            
         self.total_progress_bar_label.grid()
         self.total_progress_bar.grid()
         self.partial_progress_bar_label.grid()
