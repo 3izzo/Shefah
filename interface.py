@@ -4,7 +4,6 @@ import tkinter
 from PIL import ImageTk, Image
 from tkinter import filedialog as fd
 import cv2
-import imageio
 from tkinter import ttk
 from tkinter import messagebox
 import tkinter.font as font
@@ -252,7 +251,7 @@ class App:
             self.ROI_thread.raise_exception()
 
         self.input_video = [
-            i for i in imageio.get_reader(video_path).iter_data()]
+            i for i in skvideo.io.vreader(video_path)]
         if self.input_video:
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
@@ -418,7 +417,8 @@ class App:
                 cropped_frame = get_frames_mouth(
                     face_detector, predictor, frame, interface=self)
 
-                self.partial_progress_bar["value"] += i
+                self.partial_progress_bar["value"] = int(i / len(self.input_video) * 100)
+                self.total_progress_bar["value"] = int(i / len(self.input_video) * 25)
 
                 cropped_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2RGB)
                 # cv2.imwrite(".\\G\\frame%d.png" % i, cropped_frame)
@@ -430,18 +430,16 @@ class App:
                 i += 1
             self.partial_progress_bar["value"] = 100
             self.total_progress_bar["value"] = 25
-            self.partial_progress_bar_label["text"] = "تحميل النموذج"
-            self.partial_progress_bar["value"] = 10
+
             video_for_prediction = np.array(
                 [video_for_prediction]).astype(np.float32) / 255
-            self.partial_progress_bar["value"] = 50
-            # shefah_model = load_model()
-            self.partial_progress_bar["value"] = 100
 
-            self.total_progress_bar["value"] = 75
+
 
             self.partial_progress_bar_label["text"] = "يتوقع"
-            self.partial_progress_bar["value"] = 30
+            self.partial_progress_bar["value"] = 10
+            self.total_progress_bar["value"] = 75
+
             (predicted, predicted_as_number) = predict_lip(
                 video_for_prediction, self.shefah_model)
             self.partial_progress_bar["value"] = 100
