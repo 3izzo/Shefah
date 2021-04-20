@@ -31,7 +31,6 @@ class App:
         self.face_video = []
         self.ROI_video = []
         self.status = ""  # To change the current function of the partial bar
-        self.text_size = font.Font(size=14)
         self.shefah_model = load_model()
 
         master.title("Shefah")
@@ -43,10 +42,10 @@ class App:
         # Setting icon of master window
         master.iconphoto(False, logo)
         # Create Frames to organize widgets in the window
-        # self.frame_r = Frame(master, width=300, bg="white")
+        # self.frame_r = ttk.Frame(master, width=300, bg="white")
         # self.frame_r.pack(side="right", fill=Y, padx=2, pady=2)
 
-        self.frame = Frame(master, bg="white")
+        self.frame = ttk.Frame(master)
         self.frame.pack(side="left", expand=1, fill=BOTH)
         Grid.columnconfigure(self.frame, 0, weight=1)
         Grid.columnconfigure(self.frame, 1, weight=1)
@@ -54,57 +53,29 @@ class App:
         Grid.rowconfigure(self.frame, 0, weight=1)
         Grid.rowconfigure(self.frame, 2, weight=1)
 
-        self.frame_t = Frame(self.frame, bg="#c2c3c4")
+        self.frame_t = ttk.Frame(self.frame)
         self.frame_t.grid(row=0, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
 
-        # self.text_frame_t = Frame(self.frame_t, bg="#c2c3c4")
+        # self.text_frame_t = ttk.Frame(self.frame_t, bg="#c2c3c4")
 
         # self.text_frame_t.pack(pady=80)
 
-        Grid.rowconfigure(self.frame_t, 0, weight=1)
-        Grid.rowconfigure(self.frame_t, 1, weight=1)
-        Grid.rowconfigure(self.frame_t, 2, weight=1)
-
-        Grid.columnconfigure(self.frame_t, 0, weight=1)
-        Grid.columnconfigure(self.frame_t, 1, weight=1)
-        Grid.columnconfigure(self.frame_t, 2, weight=1)
         self.frame_t.pack_propagate(False)
 
-        # self.inner_frame_t = Frame(self.frame_t, bg="#c2c3c4")
-        # self.inner_frame_t.grid(row=0, column=0, padx=8, pady=8,
-        #                   columnspan=3, rowspan = 4, sticky=N + S + E + W)
-        # self.inner_frame_t.pack_propagate(False)
-
         # Where the output should be
-        self.frame_m = Frame(self.frame, bg="white")
+        self.frame_m = ttk.Frame(self.frame)
         self.frame_m.grid(row=1, column=0, padx=8, pady=8, columnspan=2, sticky=N + S + E + W)
 
         # Where the preprocessed videos should be
-        self.frame_b_l = Frame(self.frame, bg="#c2c3c4")
-        self.frame_b_r = Frame(self.frame, bg="#c2c3c4")
+        self.frame_b_l = ttk.Frame(self.frame)
+        self.frame_b_r = ttk.Frame(self.frame)
         self.frame_b_l.pack_propagate(False)
 
         self.frame_b_l.grid(row=2, column=0, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.grid(row=2, column=1, padx=8, pady=8, columnspan=1, sticky=N + S + E + W)
         self.frame_b_r.pack_propagate(False)
 
-        Grid.rowconfigure(self.frame_b_l, 0, weight=1)
-        Grid.rowconfigure(self.frame_b_l, 1, weight=1)
-        Grid.rowconfigure(self.frame_b_l, 2, weight=1)
-
-        Grid.columnconfigure(self.frame_b_l, 0, weight=1)
-        Grid.columnconfigure(self.frame_b_l, 1, weight=1)
-        Grid.columnconfigure(self.frame_b_l, 2, weight=1)
-
-        Grid.rowconfigure(self.frame_b_r, 0, weight=1)
-        Grid.rowconfigure(self.frame_b_r, 1, weight=1)
-        Grid.rowconfigure(self.frame_b_r, 2, weight=1)
-
-        Grid.columnconfigure(self.frame_b_r, 0, weight=1)
-        Grid.columnconfigure(self.frame_b_r, 1, weight=1)
-        Grid.columnconfigure(self.frame_b_r, 2, weight=1)
-
-        self.frame_m_b = Frame(self.frame_m, bg="white")
+        self.frame_m_b = ttk.Frame(self.frame_m)
         self.frame_m_b.pack(side=TOP)
 
         img_video_in = ImageTk.PhotoImage(Image.open(".\\icons\\video_in.png"))
@@ -127,43 +98,59 @@ class App:
 
         # Buttons to make actions
         img_select = ImageTk.PhotoImage(Image.open(".\\icons\\select.png"))
-        self.btn_select = Button(
-            self.frame_m_b, text="اختر فيديو ", command=self.open_filedialog, compound=RIGHT, width=120
+        self.btn_select = ttk.Button(
+            self.frame_m_b,
+            text="اختر فيديو ",
+            command=self.open_filedialog,
+            compound=RIGHT,
+            width=20,
+            state="Button",
         )
         self.btn_select.image = img_select
         self.btn_select.config(image=img_select)
-        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=4, pady=2)
+        self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=8, pady=2)
 
         img_camera = ImageTk.PhotoImage(Image.open(".\\icons\\camera.png"))
-        self.btn_record = Button(
-            self.frame_m_b, text="افتح الكاميرا ", command=self.open_camera, compound=RIGHT, width=120
+        self.btn_record = ttk.Button(
+            self.frame_m_b,
+            text="افتح الكاميرا ",
+            command=self.open_camera,
+            compound=RIGHT,
+            width=20,
+            state="Button",
         )
         self.btn_record.image = img_camera
         self.btn_record.config(image=img_camera)
 
-        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=4, pady=2)
-
-        self.btn_record["font"] = self.btn_select["font"] = self.text_size
+        self.btn_record.grid(column=1, row=0, sticky=NSEW, padx=8, pady=2)
 
         img_record = ImageTk.PhotoImage(Image.open(".\\icons\\record.png"))
-        self.btn_record_start = Button(
-            self.frame_m_b, text="سجل ", command=self.toggle_recording, compound=RIGHT, width=120
+        self.btn_record_start = ttk.Button(
+            self.frame_m_b,
+            text="سجل ",
+            command=self.toggle_recording,
+            compound=RIGHT,
+            width=20,
+            state="Button",
         )
         self.btn_record_start.image = img_record
         self.btn_record_start.config(image=img_record)
-        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=4, pady=2)
+        self.btn_record_start.grid(column=1, row=0, sticky=NSEW, padx=8, pady=2)
         self.btn_record_start.grid_remove()
 
         img_stop = ImageTk.PhotoImage(Image.open(".\\icons\\stop.png"))
-        self.btn_record_end = Button(
-            self.frame_m_b, text="توقف ", command=self.toggle_recording, compound=RIGHT, width=120
+        self.btn_record_end = ttk.Button(
+            self.frame_m_b,
+            text="توقف ",
+            command=self.toggle_recording,
+            compound=RIGHT,
+            width=20,
+            state="Button",
         )
         self.btn_record_end.image = img_stop
         self.btn_record_end.config(image=img_stop)
-        self.btn_record_end.grid(column=2, row=0, sticky=NSEW, padx=4, pady=2)
+        self.btn_record_end.grid(column=2, row=0, sticky=NSEW, padx=8, pady=2)
         self.btn_record_end.grid_remove()
-
-        self.btn_record_start["font"] = self.btn_record_end["font"] = self.text_size
 
         # progress bars
         self.partial_progress_bar_label = Label(self.frame, text="", bg="white")
@@ -176,7 +163,7 @@ class App:
         self.total_progress_bar = ttk.Progressbar(self.frame, orient=HORIZONTAL, mode="determinate")
         self.total_progress_bar.grid(row=103, columnspan=2, padx=8, pady=4, sticky=W + E)
 
-        self.total_progress_bar_label["font"] = self.partial_progress_bar_label["font"] = self.text_size
+        self.total_progress_bar_label["font"] = self.partial_progress_bar_label["font"] = ("Times New Roman", 14)
 
         self.total_progress_bar_label.grid_remove()
         self.total_progress_bar.grid_remove()
@@ -189,7 +176,7 @@ class App:
         # self.btn_exit.grid(row=4, sticky=W + E, pady=2)
 
         # padding
-        # Frame(frame_helper, height=16, bg="white").grid(row=10)
+        # ttk.Frame(frame_helper, height=16, bg="white").grid(row=10)
 
     def stream(self, video, vid_label, parent):
         """ takes a video and play the video """
@@ -362,7 +349,7 @@ class App:
 
         # self.text_frame_b_l.destroy()
         # self.text_frame_b_r.destroy()
-        for child in self.frame_b_l.winfo_children():   
+        for child in self.frame_b_l.winfo_children():
             child.destroy()
         if self.face_thread != None:
             self.face_thread.raise_exception()
@@ -372,7 +359,6 @@ class App:
         if self.ROI_thread != None:
             self.ROI_thread.raise_exception()
 
-            
         self.total_progress_bar_label.grid()
         self.total_progress_bar.grid()
         self.partial_progress_bar_label.grid()
@@ -445,6 +431,9 @@ class App:
 
 
 root = Tk()
+style = ttk.Style(root)
+root.tk.call("source", "azure.tcl")
+style.theme_use("azure")
 my_gui = App(root)
 # root.call("wm", "iconphoto", root._w, PhotoImage(file=".\\logo.png"))
 root.mainloop()
