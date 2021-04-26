@@ -31,6 +31,7 @@ class App:
         self.ROI_video = []
         self.status = ""  # To change the current function of the partial bar
         self.shefah_model = load_model()
+        self.first_msg = True
 
         master.title("Shefah")
         master.config(bg="white")
@@ -40,9 +41,7 @@ class App:
 
         # Setting icon of master window
         master.iconphoto(False, logo)
-        # Create Frames to organize widgets in the window
-        # self.frame_r = ttk.Frame(master, width=300, bg="white")
-        # self.frame_r.pack(side="right", fill=Y, padx=2, pady=2)
+
 
         self.frame = ttk.Frame(master)
         self.frame.pack(side="left", expand=1, fill=BOTH)
@@ -56,9 +55,6 @@ class App:
         self.frame_t.grid(row=0, column=0, padx=8, pady=8,
                           columnspan=2, sticky=N + S + E + W)
 
-        # self.text_frame_t = ttk.Frame(self.frame_t, bg="#c2c3c4")
-
-        # self.text_frame_t.pack(pady=80)
 
         self.frame_t.pack_propagate(False)
 
@@ -114,14 +110,19 @@ class App:
         self.btn_select.grid(column=0, row=0, sticky=NSEW, padx=8, pady=2)
 
         img_camera = ImageTk.PhotoImage(Image.open(".\\icons\\camera.png"))
-        self.btn_record = ttk.Button(
-            self.frame_m_b,
-            text="افتح الكاميرا ",
-            command=self.open_camera,
-            compound=RIGHT,
-            width=20,
-            state="Button",
-        )
+        try:
+            self.btn_record = ttk.Button(
+                self.frame_m_b,
+                text="افتح الكاميرا ",
+                command=self.open_camera,
+                compound=RIGHT,
+                width=20,
+                state="Button",
+            )
+        except Exception:
+            messagebox.showwarning(
+                "تنبيه",
+                "No Camera Found. Please choose a video")
         self.btn_record.image = img_camera
         self.btn_record.config(image=img_camera)
 
@@ -190,13 +191,7 @@ class App:
         self.result.grid(row=3000, column=0, padx=8, pady=8,
                          columnspan=2, sticky=N + S + E + W)
         self.result.grid_remove()
-        # self.btn_prcs = Button(frame_helper, text="ابدأ المعالجة", command=self.process_video, state=DISABLED)
-        # self.btn_prcs.grid(row=3, sticky=W + E, pady=2)
-        # self.btn_exit = Button(frame_helper, text="خروج", command=quit)
-        # self.btn_exit.grid(row=4, sticky=W + E, pady=2)
-
-        # padding
-        # ttk.Frame(frame_helper, height=16, bg="white").grid(row=10)
+  
 
     def stream(self, video, vid_label, parent):
         """ takes a video and play the video """
@@ -229,10 +224,12 @@ class App:
 
     def open_filedialog(self):
         """ Open filedialog to let the user choose the file to process """
-        messagebox.showwarning(
-            "تنبيه",
-            "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",
-        )
+        if self.first_msg:
+            messagebox.showwarning(
+                "تنبيه",
+                "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",
+            )
+            self.first_msg = False
         video_path = fd.askopenfilename()
 
         for child in self.frame_t.winfo_children():
@@ -260,14 +257,15 @@ class App:
             self.input_thread.daemon = 1
             self.input_thread.start()
             self.process_video()
-            # self.btn_prcs["state"] = "normal"
 
     def open_camera(self):
         """ Open the user's camera to record a video to process """
-        messagebox.showwarning(
-            "تنبيه",
-            "عند تسجيل الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",
-        )
+        if self.first_msg:
+            messagebox.showwarning(
+                "تنبيه",
+                "عند اختيار الفيديو يشترط التالي:\n1. أن يحتوي الفيديو على شخص واحد فقط.\n2. أن يكون وجه وشفتين المتحدث واضحتين.\n3. أن ينطق المتحدث رقم واحد بين 0-9 بشكل واضح.\n4. أن لا تتعدا مدة الفيديو عن ثانيتين وإذا تعدا سيتم اخذ اخر ثانيتين.",
+            )
+            self.first_msg = False
         for child in self.frame_t.winfo_children():
             child.destroy()
         if self.input_thread != None:
@@ -303,9 +301,11 @@ class App:
             )
             self.input_thread.daemon = 1
             self.input_thread.start()
+        else:
+            raise Exception("No Camera Found")
+                
 
         self.btn_select.grid(column=0, row=0, sticky=W + E, pady=2)
-        # self.btn_prcs["state"] = DISABLED
         self.btn_record.grid_remove()
         self.btn_record_start.grid()
         self.btn_record_start["state"] = NORMAL
@@ -338,7 +338,6 @@ class App:
                     self.input_video, vid_label, self.frame_t))
                 self.input_thread.daemon = 1
                 self.input_thread.start()
-                # self.btn_prcs["state"] = "normal"
                 self.process_video()
 
     def stream_camera_and_capture(self, capture, vid_label, parent):
@@ -371,8 +370,6 @@ class App:
 
     def process_video(self):
 
-        # self.text_frame_b_l.destroy()
-        # self.text_frame_b_r.destroy()
         for child in self.frame_b_l.winfo_children():
             child.destroy()
         if self.face_thread != None:
@@ -403,52 +400,57 @@ class App:
             self.ROI_video, vid_label, self.frame_t))
         self.ROI_thread.daemon = 1
         self.ROI_thread.start()
-
         def inner_func():
-            time.sleep(0.5)
-            i = 0
-            video_for_prediction = []
-            self.result.grid_remove()
-            self.partial_progress_bar_label["text"] = "معالجة"
-            self.partial_progress_bar["value"] = 10
-            self.total_progress_bar["value"] = 0
-            for frame in self.input_video:
-                frame = frame[:, :, :3]
-                cropped_frame = get_frames_mouth(
-                    face_detector, predictor, frame, interface=self)
+            try:    
+                time.sleep(0.5)
+                i = 0
+                video_for_prediction = []
+                self.result.grid_remove()
+                self.partial_progress_bar_label["text"] = "معالجة"
+                self.partial_progress_bar["value"] = 10
+                self.total_progress_bar["value"] = 0
+                for frame in self.input_video:
+                    frame = frame[:, :, :3]
+                    
+                    cropped_frame = get_frames_mouth(
+                        face_detector, predictor, frame, interface=self)
+                    
+                    self.partial_progress_bar["value"] = int(i / len(self.input_video) * 100)
+                    self.total_progress_bar["value"] = int(i / len(self.input_video) * 25)
 
-                self.partial_progress_bar["value"] = int(i / len(self.input_video) * 100)
-                self.total_progress_bar["value"] = int(i / len(self.input_video) * 25)
+                    cropped_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2RGB)
+                    video_for_prediction.append(cropped_frame)
+                    i += 1
 
-                cropped_frame = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2RGB)
-                # cv2.imwrite(".\\G\\frame%d.png" % i, cropped_frame)
-                video_for_prediction.append(cropped_frame)
-                i += 1
+                while i < max_frame_count:
+                    video_for_prediction.append(np.zeros((frame_h, frame_w, 3)))
+                    i += 1
+                self.partial_progress_bar["value"] = 100
+                self.total_progress_bar["value"] = 25
 
-            while i < max_frame_count:
-                video_for_prediction.append(np.zeros((frame_h, frame_w, 3)))
-                i += 1
-            self.partial_progress_bar["value"] = 100
-            self.total_progress_bar["value"] = 25
-
-            video_for_prediction = np.array(
-                [video_for_prediction]).astype(np.float32) / 255
+                video_for_prediction = np.array(
+                    [video_for_prediction]).astype(np.float32) / 255
 
 
 
-            self.partial_progress_bar_label["text"] = "يتوقع"
-            self.partial_progress_bar["value"] = 10
-            self.total_progress_bar["value"] = 75
+                self.partial_progress_bar_label["text"] = "يتوقع"
+                self.partial_progress_bar["value"] = 10
+                self.total_progress_bar["value"] = 75
 
-            (predicted, predicted_as_number) = predict_lip(
-                video_for_prediction, self.shefah_model)
-            self.partial_progress_bar["value"] = 100
+                (predicted, predicted_as_number) = predict_lip(
+                    video_for_prediction, self.shefah_model)
+                self.partial_progress_bar["value"] = 100
 
-            self.partial_progress_bar_label["text"] = "انتهى"
+                self.partial_progress_bar_label["text"] = "انتهى"
 
-            self.total_progress_bar["value"] = 100
-            self.result.grid()
-            self.result["text"] = "الرقم المنطوق: %s" % predicted_as_number
+                self.total_progress_bar["value"] = 100
+                self.result.grid()
+                self.result["text"] = "الرقم المنطوق: %s" % predicted_as_number
+            except Exception:
+                messagebox.showwarning(
+                "تنبيه",
+                    "No Face Detected. \nPlease choose another video or record a new one."
+                )
 
         if self.processing_thread != None:
             self.processing_thread.raise_exception()
@@ -462,5 +464,4 @@ style = ttk.Style(root)
 root.tk.call("source", "azure.tcl")
 style.theme_use("azure")
 my_gui = App(root)
-# root.call("wm", "iconphoto", root._w, PhotoImage(file=".\\logo.png"))
 root.mainloop()
