@@ -2,9 +2,9 @@ from keras import backend as K
 import numpy as np
 import logging
 import tensorflow as tf
-from Utilities import translate_array_to_label, get_train_validation_test_paths, cross_validation, translate_label_to_number
-from file_manager import load_video_frames
-from model1 import ShefahModel
+from utilities import translate_array_to_label, get_train_validation_test_paths, cross_validation, \
+    translate_label_to_number, checkpoints_dir, load_frames_for_training
+from model import ShefahModel
 from preprocess_videos import find_files
 import sys
 import os
@@ -70,7 +70,7 @@ def test_data(x, y, shefah_model, print_info=False):
     videos = []
     actuals_as_numbers = []
     for i in range(len(x)):
-        frames = load_video_frames(x[i])
+        frames = load_frames_for_training(x[i])
         actual = translate_array_to_label(y[i])
         actual_as_numbers = int(translate_label_to_number(actual))
         videos.append(frames)

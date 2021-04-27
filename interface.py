@@ -9,8 +9,8 @@ from tkinter import messagebox
 import tkinter.font as font
 import time
 from preprocess_videos import get_frames_mouth, face_detector, predictor
-from Utilities import *
-from Displaythread import Displaythread
+from utilities import *
+from display_thread import DisplayThread
 from predict import *
 from file_manager import get_video, OperationCancelled
 import video_recorder as Camera
@@ -226,7 +226,7 @@ class App:
                 self.ROI_thread.raise_exception()
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
+            self.input_thread = DisplayThread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
             self.input_thread.daemon = 1
             self.input_thread.start()
             self.process_video()
@@ -282,7 +282,7 @@ class App:
 
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(
+            self.input_thread = DisplayThread(
                 target=self.stream_camera_and_capture, args=(self.camera_streamer, vid_label, self.frame_t)
             )
             self.input_thread.daemon = 1
@@ -312,7 +312,7 @@ class App:
 
             vid_label = Label(self.frame_t, bg="black")
             vid_label.pack(expand=True, fill=BOTH)
-            self.input_thread = Displaythread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
+            self.input_thread = DisplayThread(target=self.stream, args=(self.input_video, vid_label, self.frame_t))
             self.input_thread.daemon = 1
             self.input_thread.start()
             self.process_video()
@@ -353,14 +353,14 @@ class App:
         self.face_video = []
         vid_label = Label(self.frame_b_l, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.face_thread = Displaythread(target=self.stream, args=(self.face_video, vid_label, self.frame_t))
+        self.face_thread = DisplayThread(target=self.stream, args=(self.face_video, vid_label, self.frame_t))
         self.face_thread.daemon = 1
         self.face_thread.start()
 
         self.ROI_video = []
         vid_label = Label(self.frame_b_r, bg="black")
         vid_label.pack(expand=True, fill=BOTH)
-        self.ROI_thread = Displaythread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_t))
+        self.ROI_thread = DisplayThread(target=self.stream, args=(self.ROI_video, vid_label, self.frame_t))
         self.ROI_thread.daemon = 1
         self.ROI_thread.start()
 
@@ -414,7 +414,7 @@ class App:
 
             self.processing_thread.raise_exception()
 
-        self.processing_thread = Displaythread(target=inner_func, args=())
+        self.processing_thread = DisplayThread(target=inner_func, args=())
         self.processing_thread.daemon = 1
         self.processing_thread.start()
 

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import re
-import skvideo
+import skvideo.io
 from tkinter import filedialog as fd
 
 video_cache = {}

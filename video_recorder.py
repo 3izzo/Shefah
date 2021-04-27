@@ -1,7 +1,7 @@
 import cv2
 import time
 import numpy as np
-from Utilities import max_frame_count
+from utilities import max_frame_count
 
 FRAME_LENGTH = 1 / 30.0
 

@@ -1,7 +1,7 @@
 import numpy as np
 import keras
 import random
-from Utilities import max_letter_index, max_label_length, max_frame_count, seed, load_video_frames, mirror_frames
+from utilities import max_letter_index, max_label_length, max_frame_count, seed, load_frames_for_training, mirror_frames
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -54,15 +54,15 @@ class DataGenerator(keras.utils.Sequence):
 
     def __data_generation(self, list_videos_temp, list_labels_temp):
         "Generates data containing batch_size samples"
-        X = np.empty((len(list_videos_temp) * 2, *self.input_shape))
+        x = np.empty((len(list_videos_temp) * 2, *self.input_shape))
         y = np.empty((len(list_videos_temp) * 2, max_label_length), dtype=int)
         for i, ID in enumerate(list_videos_temp):
-            X[2 * i] = load_video_frames(list_videos_temp[i])
+            x[2 * i] = load_frames_for_training(list_videos_temp[i])
             y[2 * i] = list_labels_temp[i]
-            X[2 * i + 1] = mirror_frames(X[2 * i])
+            x[2 * i + 1] = mirror_frames(x[2 * i])
             y[2 * i + 1] = list_labels_temp[i]
 
-        random.Random(seed).shuffle(X)
+        random.Random(seed).shuffle(x)
         random.Random(seed).shuffle(y)
 
-        return X, y
+        return x, y

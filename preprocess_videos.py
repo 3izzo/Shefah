@@ -1,12 +1,12 @@
-import skvideo.io
 import fnmatch
 import os
 import numpy as np
 import dlib
 import cv2
-from Utilities import input_videos_dir, output_videos_dir
 from datetime import datetime
 
+from file_manager import get_video_frames
+from utilities import input_videos_dir, output_videos_dir
 
 def find_files(directory, pattern):
     for root, dirs, files in os.walk(directory):

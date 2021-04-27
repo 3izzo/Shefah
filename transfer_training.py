@@ -1,9 +1,9 @@
 from keras import backend as K
 import tensorflow as tf
-from Utilities import checkpoint_pattern, get_train_validation_test_paths
+from utilities import checkpoint_pattern, get_train_validation_test_paths
 from data_generator import DataGenerator
 from keras.optimizers import Adam
-from model1 import ShefahModel
+from model import ShefahModel
 import sys
 import os
 

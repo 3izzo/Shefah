@@ -1,7 +1,7 @@
 import numpy as np
 from datetime import datetime
 from preprocess_videos import get_video_frames,get_frames_mouth, face_detector, predictor
-from Utilities import max_frame_count, frame_h, frame_w
+from utilities import max_frame_count, frame_h, frame_w
 import cv2
 
 video_path = ".\\videos\\speaker2\\2.mp4"
@@ -35,7 +35,7 @@ print(
 
 start_time = datetime.now()
 from predict import load_model, decode_predict_ctc
-from Utilities import translate_label_to_number
+from utilities import translate_label_to_number
 
 delta_time = datetime.now() - start_time
 

@@ -1,8 +1,8 @@
 from keras import backend as K
 import numpy as np
 import tensorflow as tf
-from Utilities import max_frame_count, frame_h, frame_w, translate_label_to_number, translate_array_to_label
-from model1 import ShefahModel
+from utilities import max_frame_count, frame_h, frame_w, translate_label_to_number, translate_array_to_label
+from model import ShefahModel
 from preprocess_videos import face_detector, predictor, get_frames_mouth
 from file_manager import get_video_frames
 import cv2

@@ -1,7 +1,7 @@
 import threading 
 import ctypes 
    
-class Displaythread(threading.Thread): 
+class DisplayThread(threading.Thread): 
     def __init__(self,target, args): 
         threading.Thread.__init__(self) 
         self.target = target

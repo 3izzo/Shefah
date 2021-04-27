@@ -8,7 +8,7 @@ from keras.layers import Input
 from keras.models import Model
 from keras import backend as K
 from layers import CTC
-from Utilities import frame_w, frame_h, max_frame_count, max_label_length, max_letter_index
+from utilities import frame_w, frame_h, max_frame_count, max_label_length, max_letter_index
 
 
 class ShefahModel(object):
