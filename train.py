@@ -1,11 +1,10 @@
-from keras.models import Model
-from keras import backend as K
 import tensorflow as tf
-from Utilities import *
+from Utilities import checkpoint_pattern, cross_validation, get_train_validation_test_paths
 from data_generator import DataGenerator
 from keras.optimizers import Adam
 from model1 import ShefahModel
 import sys
+import os
 
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
@@ -22,7 +21,7 @@ if gpus:
 
 
 # Get Data
-if(sys.argv[1].lower() != "cross"):
+if sys.argv[1].lower() != "cross":
     (
         x_train,
         y_train,
@@ -39,8 +38,8 @@ else:
         y_validation,
         x_test,
         y_test,
-    ) = cross_validation(int(sys.argv[2]), int(sys.argv[3]),int(sys.argv[4]))
-    checkpoints_dir = ".\\Cross_Val_Checkpoints\\Fold"+sys.argv[4]
+    ) = cross_validation(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]))
+    checkpoints_dir = ".\\Cross_Val_Checkpoints\\Fold" + sys.argv[4]
     checkpoint_pattern = checkpoints_dir + "\\cp-{epoch:04d}.ckpt"
 
 # create model
@@ -62,18 +61,14 @@ print(latest)
 start_epoch = 0
 if latest:
     model.load_weights(latest)
-    start_epoch = int("".join(c for c in latest.split('\\')[-1] if c.isdigit()))
+    start_epoch = int("".join(c for c in latest.split("\\")[-1] if c.isdigit()))
     print("-------------------------------------")
     print("loaded weights from %s" % latest)
     print("epoch is ", start_epoch)
 # print(paths)
 
-train_generator = DataGenerator(
-    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64
-)
-validation_generator = DataGenerator(
-    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
-)
+train_generator = DataGenerator(x_train, y_train, input_shape=shefah_model.input_shape, batch_size=64)
+validation_generator = DataGenerator(x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16)
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=200
 )

@@ -8,7 +8,7 @@ from keras.layers import Input
 from keras.models import Model
 from keras import backend as K
 from layers import CTC
-from Utilities import *
+from Utilities import frame_w, frame_h, max_frame_count, max_label_length, max_letter_index
 
 
 class ShefahModel(object):
@@ -33,9 +33,7 @@ class ShefahModel(object):
         else:
             self.input_shape = (self.frames_n, self.img_h, self.img_w, self.img_c)
 
-        self.input_data = Input(
-            name="the_input", shape=self.input_shape, dtype="float32"
-        )
+        self.input_data = Input(name="the_input", shape=self.input_shape, dtype="float32")
 
         self.zero1 = ZeroPadding3D(padding=(1, 2, 2), name="zero1")(self.input_data)
         self.conv1 = Conv3D(
@@ -48,9 +46,7 @@ class ShefahModel(object):
         self.batc1 = BatchNormalization(name="batc1")(self.conv1)
         self.actv1 = Activation("relu", name="actv1")(self.batc1)
         self.drop1 = SpatialDropout3D(0.5)(self.actv1)
-        self.maxp1 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max1")(
-            self.drop1
-        )
+        self.maxp1 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max1")(self.drop1)
 
         self.zero2 = ZeroPadding3D(padding=(1, 2, 2), name="zero2")(self.maxp1)
         self.conv2 = Conv3D(
@@ -63,9 +59,7 @@ class ShefahModel(object):
         self.batc2 = BatchNormalization(name="batc2")(self.conv2)
         self.actv2 = Activation("relu", name="actv2")(self.batc2)
         self.drop2 = SpatialDropout3D(0.5)(self.actv2)
-        self.maxp2 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max2")(
-            self.drop2
-        )
+        self.maxp2 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max2")(self.drop2)
 
         self.zero3 = ZeroPadding3D(padding=(1, 1, 1), name="zero3")(self.maxp2)
         self.conv3 = Conv3D(
@@ -78,9 +72,7 @@ class ShefahModel(object):
         self.batc3 = BatchNormalization(name="batc3")(self.conv3)
         self.actv3 = Activation("relu", name="actv3")(self.batc3)
         self.drop3 = SpatialDropout3D(0.5)(self.actv3)
-        self.maxp3 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max3")(
-            self.drop3
-        )
+        self.maxp3 = MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), name="max3")(self.drop3)
 
         self.resh1 = TimeDistributed(Flatten())(self.maxp3)
 
@@ -106,21 +98,15 @@ class ShefahModel(object):
         )(self.gru_1)
 
         # transforms RNN output to character activations:
-        self.dense1 = Dense(
-            self.output_size, kernel_initializer="he_normal", name="dense1"
-        )(self.gru_2)
+        self.dense1 = Dense(self.output_size, kernel_initializer="he_normal", name="dense1")(self.gru_2)
 
         self.y_pred = Activation("softmax", name="softmax")(self.dense1)
 
-        self.labels = Input(
-            name="the_labels", shape=[self.absolute_max_string_len], dtype="float32"
-        )
+        self.labels = Input(name="the_labels", shape=[self.absolute_max_string_len], dtype="float32")
         self.input_length = Input(name="input_length", shape=[1], dtype="int64")
         self.label_length = Input(name="label_length", shape=[1], dtype="int64")
 
-        self.loss_out = CTC(
-            "ctc", [self.y_pred, self.labels, self.input_length, self.label_length]
-        )
+        self.loss_out = CTC("ctc", [self.y_pred, self.labels, self.input_length, self.label_length])
 
         self.model = Model(
             inputs=[self.input_data, self.labels, self.input_length, self.label_length],
@@ -144,6 +130,4 @@ class ShefahModel(object):
     @property
     def test_function(self):
         # captures output of softmax so we can decode the output during visualization
-        return K.function(
-            [self.input_data, K.learning_phase()], [self.y_pred, K.learning_phase()]
-        )
+        return K.function([self.input_data, K.learning_phase()], [self.y_pred, K.learning_phase()])

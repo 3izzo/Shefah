@@ -1,9 +1,10 @@
+import numpy as np
 from datetime import datetime
-from preprocess_videos import *
+from preprocess_videos import get_video_frames,get_frames_mouth, face_detector, predictor
 from Utilities import max_frame_count, frame_h, frame_w
 import cv2
 
-video_path = ".\\videos\\2.mp4"
+video_path = ".\\videos\\speaker2\\2.mp4"
 
 
 def preprocessing(video_path):
@@ -33,7 +34,19 @@ print(
 )
 
 start_time = datetime.now()
-from predict import load_model, predict_lip
+from predict import load_model, decode_predict_ctc
+from Utilities import translate_label_to_number
+
+delta_time = datetime.now() - start_time
+
+print(
+    "tensorflow init in",
+    delta_time.microseconds / 1000000 + delta_time.seconds,
+    "s",
+)
+
+start_time = datetime.now()
+
 shefah_model = load_model()
 delta_time = datetime.now() - start_time
 
@@ -44,10 +57,23 @@ print(
 )
 
 start_time = datetime.now()
-(predicted, _) = predict_lip(frames, shefah_model)
+y_prediction = shefah_model.predict(frames)
 delta_time = datetime.now() - start_time
 print(
     "prediction done in",
+    delta_time.microseconds / 1000000 + delta_time.seconds,
+    "s",
+)
+
+start_time = datetime.now()
+
+decoded_prediction = decode_predict_ctc(y_prediction)
+predicted = decoded_prediction[0]
+predicted_as_numbers = translate_label_to_number(predicted)
+
+delta_time = datetime.now() - start_time
+print(
+    "postprocessing done in",
     delta_time.microseconds / 1000000 + delta_time.seconds,
     "s",
 )

@@ -1,6 +1,5 @@
 import threading 
 import ctypes 
-import time 
    
 class Displaythread(threading.Thread): 
     def __init__(self,target, args): 

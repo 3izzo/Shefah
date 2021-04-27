@@ -1,10 +1,12 @@
-import sys
 from keras import backend as K
 import numpy as np
 import tensorflow as tf
-from Utilities import *
+from Utilities import max_frame_count, frame_h, frame_w, translate_label_to_number, translate_array_to_label
 from model1 import ShefahModel
-from preprocess_videos import *
+from preprocess_videos import face_detector, predictor, get_frames_mouth
+from file_manager import get_video_frames
+import cv2
+import os
 
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
@@ -67,24 +69,24 @@ def predict_lip(frames, model):
     return predicted, predicted_as_numbers
 
 
-def preprocessing(video_path):
+def preprocessing(input_frames):
     frames = []
     i = 0
-    for frame in get_video_frames(video_path):
+    for frame in input_frames:
         cropped_frame = cv2.cvtColor(get_frames_mouth(face_detector, predictor, frame), cv2.COLOR_BGR2RGB)
         frames.append(cropped_frame)
         i += 1
     while i < max_frame_count:
         frames.append(np.zeros((frame_h, frame_w, 3)))
         i += 1
-    frames = np.array([frames])
+    frames = np.array([frames]).astype(np.float32) / 255
     return frames
 
 
 if __name__ == "__main__":
-
-    video_path = sys.argv[1]
+    from file_manager import get_video
+    video_path = get_video()
     shefah_model = load_model()
     frames = preprocessing(video_path)
-    (predicted,_) = predict_lip(frames, shefah_model)
+    (predicted, _) = predict_lip(frames, shefah_model)
     print(predicted)

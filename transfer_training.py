@@ -1,11 +1,11 @@
-from keras.models import Model, load_model
 from keras import backend as K
 import tensorflow as tf
-from Utilities import *
+from Utilities import checkpoint_pattern, get_train_validation_test_paths
 from data_generator import DataGenerator
 from keras.optimizers import Adam
 from model1 import ShefahModel
 import sys
+import os
 
 # Enable GPU Accleration
 gpus = tf.config.experimental.list_physical_devices("GPU")
@@ -19,8 +19,6 @@ if gpus:
     except RuntimeError as e:
         # Memory growth must be set before GPUs have been initialized
         print(e)
-
-
 
 
 # create model
@@ -71,7 +69,6 @@ else:
         layer.trainable = False
 
 
-
 # Get Data
 (
     x_train,
@@ -84,12 +81,8 @@ else:
 
 start_epoch = 0
 
-train_generator = DataGenerator(
-    x_train, y_train, input_shape=shefah_model.input_shape, batch_size=38
-)
-validation_generator = DataGenerator(
-    x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16
-)
+train_generator = DataGenerator(x_train, y_train, input_shape=shefah_model.input_shape, batch_size=38)
+validation_generator = DataGenerator(x_validation, y_validation, input_shape=shefah_model.input_shape, batch_size=16)
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_pattern, verbose=1, save_weights_only=True, save_freq=15 * len(train_generator)
 )

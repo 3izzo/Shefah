@@ -17,10 +17,7 @@ def find_files(directory, pattern):
                 yield filename
 
 
-def get_video_frames(path):
-    videogen = skvideo.io.vreader(path)
-    frames = np.array([frame for frame in videogen])
-    return frames
+
 
 
 def get_frames_mouth(detector, predictor, frame, interface=None):
@@ -33,25 +30,17 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
     dets = detector(frame)
     shape = None
     for k, d in enumerate(dets):
-        # print(d)
-        h = d.bottom() - d.top()
-        # d = dlib.rectangle(d.left() - 10, int(d.top() - h * 0.2), d.right() + 10, int(d.bottom() + h * 0.2))
-        # print(d)
-        # print()
         if shape == None:
             shape = predictor(frame, d)
             if not interface == None:
                 interface.face_video.append(frame[d.top() : d.bottom(), d.left() : d.right()])
         else:
-            # print(type(shape.rect))
             shape_size = shape.rect.area()
-            # print(shape_size)
             shape_temp = predictor(frame, d)
             shape_temp_size = shape_temp.rect.area()
             if shape_temp_size > shape_size:
                 shape = shape_temp
 
-    # print("=========")
     if shape is None:
         raise Exception("No Face Detected")
     mouth_points = []
@@ -106,15 +95,7 @@ def get_frames_mouth(detector, predictor, frame, interface=None):
 
         interface.ROI_video.append(ROI[mouth_t:mouth_b, mouth_l:mouth_r])
 
-    # if not mouth_b - mouth_t == MOUTH_HEIGHT:
-    #     print("math is broken", mouth_t, mouth_b, mouth_r, mouth_l)
-    # if not mouth_r - mouth_l == MOUTH_WIDTH:
-    #     print("math is broken", mouth_t, mouth_b, mouth_r, mouth_l)
-    x = resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
-    # if x.shape != (MOUTH_HEIGHT, MOUTH_WIDTH, 3):
-    #     print("math is broken", mouth_t, mouth_b, mouth_r, mouth_l, x.shape, d, frame.shape)
-
-    return x
+    return resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
 
 
 def make_dir(dir):

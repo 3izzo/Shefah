@@ -1,10 +1,9 @@
 import numpy as np
 import cv2
-import os
-import re
 from fuzzywuzzy import fuzz
 from numpy import random as numpy_random
 import random
+from file_manager import find_dirs
 
 letters = [
     "ا",
@@ -55,7 +54,7 @@ seed = 69
 video_cache = {}
 
 
-def load_video_frames(path):
+def load_frames_for_training(path):
     if path in video_cache:
         return video_cache[path]
     frames = []
@@ -73,7 +72,7 @@ def load_video_frames(path):
             % (name, max_frame_count)
         )
     # padding
-    frames = randomly_duplicate_first_frame(frames)
+    frames = add_padding(frames)
     # normalize the frame
     try:
         res = np.array(frames).astype(np.float32) / 255
@@ -95,28 +94,14 @@ def mirror_frames(frames):
 zeros_frame = np.zeros((frame_h, frame_w, 3))
 
 
-def randomly_duplicate_first_frame(frames):
+def add_padding(frames):
 
     if len(frames) >= max_frame_count:
         return frames
-    # frames = frames.tolist()
-    # time_to_duplicate = np.random.randint(1, max_frame_count - len(frames))
-    time_to_duplicate = 0
-    # x = np.array([frames[0]] * time_to_duplicate)
-    y = np.array([zeros_frame] * (max_frame_count - time_to_duplicate - len(frames)))
+    y = np.array([zeros_frame] * (max_frame_count - len(frames)))
     frames = np.concatenate([frames, y])
 
     return frames
-
-
-def find_dirs(directory, pattern):
-    for root, dirs, files in os.walk(directory):
-        # print(root, dirs, files)
-        for basename in dirs:
-            # print(basename,re.match(basename, pattern))
-            if re.match(pattern, basename):
-                dir = os.path.join(root, basename)
-                yield dir
 
 
 def get_label_from_path(path):
@@ -130,6 +115,10 @@ def get_label_from_path(path):
 
 
 def translate_label_to_array(label):
+    """
+    ex: input:  'واحد'
+        result: [17,0,5,7]
+    """
     arr = np.empty((max_label_length))
     for i in range(max_label_length):
         if i >= len(label):
@@ -144,6 +133,10 @@ def translate_label_to_array(label):
 
 
 def translate_array_to_label(arr):
+    """
+    ex: input: [17,0,5,7]
+        result:  'واحد'
+    """
     label = ""
     for i in arr:
         if i == -1:
@@ -177,6 +170,7 @@ def translate_word_to_number(word):
 
 
 def translate_word_to_word(word):
+    """ خسه، خمسه"""
     res = 0
     best_ratio = 0
     for key in mapping.keys():
@@ -209,7 +203,7 @@ def get_train_validation_test_paths(trainCount, valCount):
         random_index = np.random.randint(0, len(speakers_paths))
         speaker_path = speakers_paths.pop(random_index)
         print(speaker_path)
-        extract_videos(train_paths, train_labels, speaker_path)
+        get_paths_lables(train_paths, train_labels, speaker_path)
     print("validation speakers:")
 
     # choose random speakers and all of their videos to the validation data
@@ -219,12 +213,12 @@ def get_train_validation_test_paths(trainCount, valCount):
         speaker_path = speakers_paths.pop(random_index)
         print(speaker_path)
 
-        extract_videos(validation_paths, validation_labels, speaker_path)
+        get_paths_lables(validation_paths, validation_labels, speaker_path)
     print("testing speakers:")
 
     for speaker_path in speakers_paths:
         print(speaker_path)
-        extract_videos(test_paths, test_labels, speaker_path)
+        get_paths_lables(test_paths, test_labels, speaker_path)
 
     random.Random(seed).shuffle(train_paths)
     random.Random(seed).shuffle(train_labels)
@@ -271,12 +265,12 @@ def cross_validation(dataCount, numberOfFolds, currnetFold):
         # choose random speaker from speakers_paths
         speaker_path = speakers_paths.pop(start)
         print(speaker_path)
-        extract_videos(test_paths, test_labels, speaker_path)
+        get_paths_lables(test_paths, test_labels, speaker_path)
 
     print("training speakers:", len(speakers_paths))
     for speaker_path in speakers_paths:
         print(speaker_path)
-        extract_videos(train_paths, train_labels, speaker_path)
+        get_paths_lables(train_paths, train_labels, speaker_path)
 
     random.Random(seed).shuffle(train_paths)
     random.Random(seed).shuffle(train_labels)
@@ -293,11 +287,9 @@ def cross_validation(dataCount, numberOfFolds, currnetFold):
     )
 
 
-def extract_videos(train_paths, train_labels, speaker_path):
+def get_paths_lables(paths, labels, speaker_path):
     # go through every video of the speaker
     for dir in find_dirs(speaker_path, "[0-9]"):
         label = get_label_from_path(dir)
-        # if int(translate_label_to_number(label)) >= 5:
-        #     continue
-        train_paths.append(dir)
-        train_labels.append(translate_label_to_array(label))
+        paths.append(dir)
+        labels.append(translate_label_to_array(label))
