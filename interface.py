@@ -335,6 +335,9 @@ class App:
 
     def process_video(self):
 
+        self.btn_select["state"] = DISABLED
+        self.btn_record["state"] = DISABLED
+
         for child in self.frame_b_l.winfo_children():
             child.destroy()
         if self.face_thread != None:
@@ -411,6 +414,9 @@ class App:
                 self.total_progress_bar.grid_remove()
                 self.partial_progress_bar_label.grid_remove()
                 self.partial_progress_bar.grid_remove()
+            finally:
+                self.btn_select["state"] = NORMAL
+                self.btn_record["state"] = NORMAL
 
             self.processing_thread.raise_exception()
 
